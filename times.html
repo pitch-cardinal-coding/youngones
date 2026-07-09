@@ -234,6 +234,21 @@
   text-align: center;
 }
 
+/* ─── Home button ─── */
+.home-btn {
+  position: fixed; top: 14px; left: 14px; z-index: 999;
+  width: 40px; height: 40px; border-radius: 50%;
+  background: rgba(44,62,80,0.85); color: white; border: none;
+  font-size: 1.2em; cursor: pointer; transition: all 0.2s;
+  display: flex; align-items: center; justify-content: center;
+  text-decoration: none; font-family: Inter, sans-serif;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+.home-btn:hover { background: rgba(44,62,80,1); transform: scale(1.1); }
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+body { animation: fadeIn 0.3s ease; }
+
 /* ─── Mobile Responsive ─── */
 @media (max-width: 768px) {
   .opt-btn, .p-opt-btn {
@@ -380,6 +395,7 @@ function renderQuestion(table) {
     const pct = state.total > 0 ? Math.round(state.correct / state.total * 100) : 0;
     scoreEl.innerHTML = `<span>✅ <strong>${state.correct}</strong> / ${state.total}</span> <span>🎯 <strong>${pct}%</strong></span>`;
   }
+  requestAnimationFrame(() => Reveal.layout());
 }
 
 function checkAnswer(btn, table) {
@@ -552,6 +568,7 @@ function renderPracticeQuestion(table) {
   optsEl.innerHTML = q.options.map((opt, i) =>
     `<button class="p-opt-btn" style="border-color:${color};" data-table="${table}" data-answer="${q.answer}" data-value="${opt}" onclick="checkPractice(this, ${table})">${opt}</button>`
   ).join('');
+  requestAnimationFrame(() => Reveal.layout());
 }
 
 function updatePracticeScore(table) {
@@ -562,13 +579,14 @@ function updatePracticeScore(table) {
   const sEl = document.getElementById(`ps-${table}`);
   const pEl = document.getElementById(`pp-${table}`);
   const nEl = document.getElementById(`pn-${table}`);
+  const threshold = 8;
   if (cEl) cEl.textContent = state.correct;
-  if (tEl) tEl.textContent = state.total;
+  if (tEl) tEl.textContent = threshold;
   if (sEl) sEl.textContent = state.streak;
-  if (pEl) pEl.textContent = state.total > 0 ? Math.round(state.correct / state.total * 100) + '%' : '0%';
+  if (pEl) pEl.textContent = Math.min(100, Math.round(state.correct / threshold * 100)) + '%';
 
   // Show next button when 8+ correct
-  if (nEl && state.correct >= 8) {
+  if (nEl && state.correct >= threshold) {
     nEl.style.display = 'block';
   }
 }
@@ -645,6 +663,7 @@ function newMixedQuestion() {
   optsEl.innerHTML = options.map((opt, i) =>
     `<button class="opt-btn" data-mixed="true" data-answer="${answer}" data-value="${opt}" onclick="checkMixed(this)">${opt}</button>`
   ).join('');
+  requestAnimationFrame(() => Reveal.layout());
 }
 
 function checkMixed(btn) {
@@ -682,6 +701,8 @@ function checkMixed(btn) {
 Reveal.on('slidechanged', event => {
   const slide = event.currentSlide;
 
+  requestAnimationFrame(() => Reveal.layout());
+
   // Practice slide
   if (slide.classList.contains('practice-slide')) {
     const table = parseInt(slide.dataset.table);
@@ -714,7 +735,7 @@ Reveal.initialize({
   controls: true,
   progress: true,
   center: true,
-  hash: true,
+  hash: false,
   transition: 'slide',
   width: 960,
   height: 700,
@@ -741,5 +762,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }, 300);
 });
 </script>
+<button class="home-btn" title="Home" onclick="location.replace('index.html')">⌂</button>
 </body>
 </html>

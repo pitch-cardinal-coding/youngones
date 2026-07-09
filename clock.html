@@ -173,6 +173,21 @@
   .controls-row { display: none; }
 }
 
+/* ─── Home button ─── */
+.home-btn {
+  position: fixed; top: 14px; left: 14px; z-index: 999;
+  width: 40px; height: 40px; border-radius: 50%;
+  background: rgba(44,62,80,0.85); color: white; border: none;
+  font-size: 1.2em; cursor: pointer; transition: all 0.2s;
+  display: flex; align-items: center; justify-content: center;
+  text-decoration: none; font-family: Inter, sans-serif;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+.home-btn:hover { background: rgba(44,62,80,1); transform: scale(1.1); }
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+body { animation: fadeIn 0.3s ease; }
+
 /* ─── Mobile Responsive ─── */
 @media (max-width: 768px) {
   .controls-row button {
@@ -494,7 +509,7 @@ Reveal.initialize({
   controls: true,
   progress: true,
   center: true,
-  hash: true,
+  hash: false,
   transition: 'slide',
   backgroundTransition: 'fade',
   width: 960,
@@ -716,6 +731,7 @@ function drawClock(id) {
     const isWordy = id === 'clock-6' || id === 'clock-7' || id === 'clock-8' || id === 'clock-9';
     label.textContent = isWordy ? formatTimeWords(st.hours, st.minutes) : formatTime(st.hours, st.minutes);
   }
+  requestAnimationFrame(() => Reveal.layout());
 }
 
 // ─── Time formatting ──────────────────────────────────
@@ -908,15 +924,19 @@ Reveal.on('slidechanged', event => {
   // Redraw all visible clocks (handles canvas repaint after reveal transitions)
   const canvases = document.querySelectorAll('canvas');
   canvases.forEach(c => drawClock(c.id));
+  requestAnimationFrame(() => Reveal.layout());
 });
 
 // ─── Initial draw ─────────────────────────────────────
 document.querySelectorAll('canvas').forEach(c => drawClock(c.id));
+requestAnimationFrame(() => Reveal.layout());
 
 // ─── Rerender on resize ───────────────────────────────
 window.addEventListener('resize', () => {
   document.querySelectorAll('canvas').forEach(c => drawClock(c.id));
+  requestAnimationFrame(() => Reveal.layout());
 });
 </script>
+<button class="home-btn" title="Home" onclick="location.replace('index.html')">⌂</button>
 </body>
 </html>

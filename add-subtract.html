@@ -50,7 +50,7 @@
   display: flex !important;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: center;
   padding: 16px 24px !important;
 }
 .level-header {
@@ -186,6 +186,21 @@
 .reveal .progress span { background: #e65100; }
 
 .encourage-msg { min-height: 1.3em; }
+
+/* ─── Home button ─── */
+.home-btn {
+  position: fixed; top: 14px; left: 14px; z-index: 999;
+  width: 40px; height: 40px; border-radius: 50%;
+  background: rgba(44,62,80,0.85); color: white; border: none;
+  font-size: 1.2em; cursor: pointer; transition: all 0.2s;
+  display: flex; align-items: center; justify-content: center;
+  text-decoration: none; font-family: Inter, sans-serif;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+.home-btn:hover { background: rgba(44,62,80,1); transform: scale(1.1); }
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+body { animation: fadeIn 0.3s ease; }
 
 /* ─── Mobile Responsive ─── */
 @media (max-width: 768px) {
@@ -557,8 +572,20 @@ function genAdd3C() {
   let a, b;
   do {
     a = threeDigit(); b = threeDigit();
-  } while (a + b === a + 0); // just ensure sum > a
+  } while (!hasCarry(a, b));
   return { a, b, answer: a + b };
+}
+
+function hasCarry(a, b) {
+  let c = 0;
+  while (a > 0 || b > 0) {
+    const sum = (a % 10) + (b % 10) + c;
+    c = sum >= 10 ? 1 : 0;
+    if (c) return true;
+    a = Math.floor(a / 10);
+    b = Math.floor(b / 10);
+  }
+  return false;
 }
 
 // Subtraction: no borrow (2-digit)
@@ -725,23 +752,26 @@ function renderVertical(containerId, a, b, op, answer, showAnswer, levelId) {
 // ─── Question generation ────────────────────────────────
 function newQuestion(levelId) {
   initLevel(levelId);
-  const cfg = LEVEL_CONFIG[levelId];
-  if (!cfg) return;
 
   let prob;
   if (levelId === 'mixed') {
     const levels = Object.keys(LEVEL_CONFIG);
     const l = levels[rand(0, levels.length - 1)];
-    prob = LEVEL_CONFIG[l].gen();
+    const mc = LEVEL_CONFIG[l];
+    prob = mc.gen();
+    prob.op = mc.op || (l.startsWith('add') ? '+' : '−');
   } else {
+    const cfg = LEVEL_CONFIG[levelId];
+    if (!cfg) return;
     prob = cfg.gen();
+    prob.op = cfg.op || (levelId.startsWith('add') ? '+' : '−');
   }
   if (!prob) return;
 
   currentProblems[levelId] = prob;
   const opts = genOptions(prob.answer);
 
-  renderVertical(`v-${levelId}`, prob.a, prob.b, cfg.op || (levelId.startsWith('add') ? '+' : '−'), prob.answer, false, levelId);
+  renderVertical(`v-${levelId}`, prob.a, prob.b, prob.op, prob.answer, false, levelId);
 
   const optsEl = document.getElementById(`opts-${levelId}`);
   if (optsEl) {
@@ -771,8 +801,7 @@ function checkAnswer(btn, levelId) {
     // Show the answer in the vertical display
     const prob = currentProblems[levelId];
     if (prob) {
-      const cfg = LEVEL_CONFIG[levelId];
-      renderVertical(`v-${levelId}`, prob.a, prob.b, cfg.op || (levelId.startsWith('add') ? '+' : '−'), prob.answer, true, levelId);
+      renderVertical(`v-${levelId}`, prob.a, prob.b, prob.op, prob.answer, true, levelId);
     }
     setTimeout(() => newQuestion(levelId), 500);
   } else {
@@ -791,16 +820,17 @@ function updateScore(levelId) {
   const state = scores[levelId];
   if (!state) return;
   const scoreEl = document.getElementById(`score-${levelId}`);
+  const nextEl = document.getElementById(`next-${levelId}`);
+  const threshold = nextEl ? 5 : state.total;
   if (scoreEl) {
-    const pct = state.total > 0 ? Math.round(state.correct / state.total * 100) : 0;
-    scoreEl.innerHTML = `<span>✅ <strong>${state.correct}</strong> / ${state.total}</span> <span>🎯 <strong>${pct}%</strong></span>`;
+    const pct = threshold > 0 ? Math.min(100, Math.round(state.correct / threshold * 100)) : 0;
+    scoreEl.innerHTML = `<span>✅ <strong>${state.correct}</strong> / ${threshold}</span> <span>🎯 <strong>${pct}%</strong></span>`;
   }
 
-  // Show "next" button if 5+ correct
-  const nextEl = document.getElementById(`next-${levelId}`);
   if (nextEl && state.correct >= 5) {
     nextEl.style.display = 'block';
   }
+  requestAnimationFrame(() => Reveal.layout());
 }
 
 // ─── Slide change handler ───────────────────────────────
@@ -808,7 +838,7 @@ Reveal.initialize({
   controls: true,
   progress: true,
   center: true,
-  hash: true,
+  hash: false,
   transition: 'slide',
   width: 960,
   height: 700,
@@ -827,6 +857,7 @@ Reveal.on('slidechanged', event => {
       if (!currentProblems['mixed']) newQuestion('mixed');
     }
   }
+  requestAnimationFrame(() => Reveal.layout());
 });
 
 // ─── Init first questions ───────────────────────────────
@@ -847,5 +878,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }, 300);
 });
 </script>
+<button class="home-btn" title="Home" onclick="location.replace('index.html')">⌂</button>
 </body>
 </html>

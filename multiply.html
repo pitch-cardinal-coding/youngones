@@ -47,7 +47,7 @@
   display: flex !important;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: center;
   padding: 16px 24px !important;
 }
 .level-header {
@@ -218,6 +218,21 @@
   font-weight: 700;
   color: white;
 }
+
+/* ─── Home button ─── */
+.home-btn {
+  position: fixed; top: 14px; left: 14px; z-index: 999;
+  width: 40px; height: 40px; border-radius: 50%;
+  background: rgba(44,62,80,0.85); color: white; border: none;
+  font-size: 1.2em; cursor: pointer; transition: all 0.2s;
+  display: flex; align-items: center; justify-content: center;
+  text-decoration: none; font-family: Inter, sans-serif;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+.home-btn:hover { background: rgba(44,62,80,1); transform: scale(1.1); }
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+body { animation: fadeIn 0.3s ease; }
 
 /* ─── Mobile Responsive ─── */
 @media (max-width: 768px) {
@@ -498,7 +513,7 @@ const ENCOURAGE = [
 ];
 
 const LEVEL_CONFIG = {
-  fact1:   { label: 'Facts 1-5×',    color: '#8e24aa', level: 'fact',   maxA: 5,  maxB: 5 },
+  fact1:   { label: 'Facts 1-5×',    color: '#8e24aa', level: 'fact',   maxA: 5,  maxB: 5, minA: 1, minB: 1 },
   fact2:   { label: 'Facts 6-9×',    color: '#6a1b9a', level: 'fact',   maxA: 9,  maxB: 9, minA: 6, minB: 2 },
   mul2x1nc:{ label: '2×1 No Carry',  color: '#ab47bc', level: '2x1nc' },
   mul2x1c: { label: '2×1 Carry',     color: '#7b1fa2', level: '2x1c' },
@@ -624,27 +639,28 @@ function renderMulti(containerId, a, b, answer, showAnswer) {
 // ─── Question generation ────────────────────────────────
 function newQuestion(levelId) {
   initLevel(levelId);
-  const cfg = LEVEL_CONFIG[levelId];
-  if (!cfg) return;
 
   let prob;
+  let levelCfg;
   if (levelId === 'mixed') {
     const levels = Object.keys(LEVEL_CONFIG);
     const l = levels[rand(0, levels.length - 1)];
-    const mc = LEVEL_CONFIG[l];
-    if (mc.level === 'fact') {
-      prob = genBasicFact(mc.maxA, mc.maxB, mc.minA, mc.minB);
-    } else if (mc.level === '2x1nc') prob = gen2x1NC();
-    else if (mc.level === '2x1c') prob = gen2x1C();
-    else if (mc.level === '3x1') prob = gen3x1();
-    else if (mc.level === '2x2') prob = gen2x2();
+    levelCfg = LEVEL_CONFIG[l];
+    if (levelCfg.level === 'fact') {
+      prob = genBasicFact(levelCfg.maxA, levelCfg.maxB, levelCfg.minA, levelCfg.minB);
+    } else if (levelCfg.level === '2x1nc') prob = gen2x1NC();
+    else if (levelCfg.level === '2x1c') prob = gen2x1C();
+    else if (levelCfg.level === '3x1') prob = gen3x1();
+    else if (levelCfg.level === '2x2') prob = gen2x2();
   } else {
-    if (cfg.level === 'fact') {
-      prob = genBasicFact(cfg.maxA, cfg.maxB, cfg.minA, cfg.minB);
-    } else if (cfg.level === '2x1nc') prob = gen2x1NC();
-    else if (cfg.level === '2x1c') prob = gen2x1C();
-    else if (cfg.level === '3x1') prob = gen3x1();
-    else if (cfg.level === '2x2') prob = gen2x2();
+    levelCfg = LEVEL_CONFIG[levelId];
+    if (!levelCfg) return;
+    if (levelCfg.level === 'fact') {
+      prob = genBasicFact(levelCfg.maxA, levelCfg.maxB, levelCfg.minA, levelCfg.minB);
+    } else if (levelCfg.level === '2x1nc') prob = gen2x1NC();
+    else if (levelCfg.level === '2x1c') prob = gen2x1C();
+    else if (levelCfg.level === '3x1') prob = gen3x1();
+    else if (levelCfg.level === '2x2') prob = gen2x2();
   }
   if (!prob) return;
 
@@ -673,8 +689,8 @@ function newQuestion(levelId) {
   const hintEl = document.getElementById(`hint-${levelId}`);
   if (hintEl) {
     if (prob.type !== 'fact') {
-      if (cfg.level === '2x1c') hintEl.textContent = `💡 Multiply ${prob.b} × ${prob.a % 10} (units) first, carry, then ${prob.b} × ${Math.floor(prob.a / 10)} (tens)`;
-      else if (cfg.level === '2x1nc') hintEl.textContent = `💡 ${prob.a} × ${prob.b} = ? Multiply units first, then tens`;
+      if (levelCfg.level === '2x1c') hintEl.textContent = `💡 Multiply ${prob.b} × ${prob.a % 10} (units) first, carry, then ${prob.b} × ${Math.floor(prob.a / 10)} (tens)`;
+      else if (levelCfg.level === '2x1nc') hintEl.textContent = `💡 ${prob.a} × ${prob.b} = ? Multiply units first, then tens`;
       else hintEl.textContent = '';
     } else {
       hintEl.textContent = '';
@@ -688,6 +704,7 @@ function newQuestion(levelId) {
     ).join('');
   }
   updateScore(levelId);
+  requestAnimationFrame(() => Reveal.layout());
 }
 
 function checkAnswer(btn, levelId) {
@@ -729,17 +746,19 @@ function checkAnswer(btn, levelId) {
     setTimeout(() => newQuestion(levelId), 900);
   }
   updateScore(levelId);
+  requestAnimationFrame(() => Reveal.layout());
 }
 
 function updateScore(levelId) {
   const state = scores[levelId];
   if (!state) return;
   const scoreEl = document.getElementById(`score-${levelId}`);
-  if (scoreEl) {
-    const pct = state.total > 0 ? Math.round(state.correct / state.total * 100) : 0;
-    scoreEl.innerHTML = `<span>✅ <strong>${state.correct}</strong> / ${state.total}</span> <span>🎯 <strong>${pct}%</strong></span>`;
-  }
   const nextEl = document.getElementById(`next-${levelId}`);
+  const threshold = nextEl ? 5 : state.total;
+  if (scoreEl) {
+    const pct = threshold > 0 ? Math.min(100, Math.round(state.correct / threshold * 100)) : 0;
+    scoreEl.innerHTML = `<span>✅ <strong>${state.correct}</strong> / ${threshold}</span> <span>🎯 <strong>${pct}%</strong></span>`;
+  }
   if (nextEl && state.correct >= 5) {
     nextEl.style.display = 'block';
   }
@@ -750,7 +769,7 @@ Reveal.initialize({
   controls: true,
   progress: true,
   center: true,
-  hash: true,
+  hash: false,
   transition: 'slide',
   width: 960,
   height: 700,
@@ -769,6 +788,7 @@ Reveal.on('slidechanged', event => {
       if (!currentProblems['mixed']) newQuestion('mixed');
     }
   }
+  requestAnimationFrame(() => Reveal.layout());
 });
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -785,5 +805,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }, 300);
 });
 </script>
+<button class="home-btn" title="Home" onclick="location.replace('index.html')">⌂</button>
 </body>
 </html>
