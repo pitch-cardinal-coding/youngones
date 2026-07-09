@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>✖ Multiplication — Learn Times Tables & Multi-Digit</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/white.css">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap');
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+.reveal {
+  font-family: 'Inter', sans-serif;
+  font-size: 20px;
+  background: #f5f0eb;
+}
+.reveal .slides { text-align: center; }
+
+/* ─── Title Slide ─── */
+.slide-title {
+  background: linear-gradient(135deg, #6a1b9a, #4a148c) !important;
+  color: white !important;
+  display: flex !important;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 40px !important;
+}
+.slide-title h1 { color: white !important; font-size: 2.6em; font-weight: 900; letter-spacing: -0.03em; }
+.slide-title .title-divider { width: 80px; height: 4px; background: #ffd54f; margin: 0.5em auto; border-radius: 2px; }
+.slide-title p { color: rgba(255,255,255,0.75) !important; font-size: 1em; font-weight: 300; }
+
+/* ─── Section slides ─── */
+.slide-section {
+  display: flex !important;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 24px 30px !important;
+}
+.slide-section h2 { font-size: 1.6em; font-weight: 800; margin-bottom: 0.3em; }
+
+/* ─── Level slides ─── */
+.level-slide {
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 16px 24px !important;
+}
+.level-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+.level-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  font-size: 1.2em;
+  font-weight: 900;
+  color: white;
+  padding: 0 12px;
+  flex-shrink: 0;
+}
+.level-label {
+  font-size: 0.65em;
+  color: #6c757d;
+  font-weight: 500;
+  margin-bottom: 2px;
+}
+.level-header h2 { margin: 0; font-size: 1.2em; font-weight: 800; }
+
+/* ─── Vertical Multiplication Display ─── */
+.v-math {
+  font-family: 'JetBrains Mono', monospace;
+  display: inline-block;
+  background: white;
+  border: 2px solid #e9ecef;
+  border-radius: 14px;
+  padding: 10px 20px 8px;
+  margin: 6px 0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  text-align: right;
+}
+.v-math .v-row { display: flex; align-items: center; justify-content: flex-end; gap: 4px; height: 28px; }
+.v-math .v-d { width: 32px; text-align: center; font-size: 1.1em; font-weight: 700; color: #212529; font-family: 'JetBrains Mono', monospace; }
+.v-math .v-op-sig { width: 36px; text-align: center; font-size: 1.1em; font-weight: 700; color: #495057; flex-shrink: 0; }
+.v-math .v-carry-row { height: 20px; margin-bottom: -4px; }
+.v-math .v-carry-row .v-d { font-size: 0.75em; color: #e74c3c; font-weight: 700; }
+.v-math .v-ans-row { border-top: 2px solid #212529; padding-top: 2px; margin-top: 0; }
+.v-math .v-ans-row .v-d { color: #6a1b9a; font-weight: 900; }
+.v-math .v-qmark .v-d { color: #6c757d !important; }
+.v-math .v-partial { display: flex; align-items: center; justify-content: flex-end; gap: 4px; height: 26px; }
+.v-math .v-partial .v-d { font-size: 0.9em; color: #495057; }
+.v-math .v-row-label { font-family: Inter, sans-serif; font-size: 0.55em; color: #adb5bd; margin-right: 6px; }
+.v-math .v-row .v-x { width: 24px; text-align: center; font-size: 0.9em; color: #6c757d; }
+
+/* ─── Simple fact display ─── */
+.fact-display {
+  font-size: 2.4em;
+  font-weight: 900;
+  color: #212529;
+  background: white;
+  border: 2px solid #e9ecef;
+  border-radius: 16px;
+  padding: 12px 40px;
+  margin: 6px 0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  display: inline-block;
+}
+.fact-display .q-mark { color: #adb5bd; }
+.fact-display .fd-op { color: #6c757d; font-weight: 600; }
+.fact-display .fd-eq { color: #adb5bd; font-weight: 300; }
+
+/* ─── Practice Quiz ─── */
+.prac-area { margin-top: 8px; width: 100%; max-width: 520px; }
+.prac-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  max-width: 320px;
+  margin: 8px auto;
+}
+.prac-options button {
+  font-family: 'Inter', sans-serif;
+  font-size: 1.1em;
+  font-weight: 700;
+  padding: 10px 16px;
+  border: 2px solid #dee2e6;
+  border-radius: 10px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.12s;
+  color: #212529;
+}
+.prac-options button:hover { transform: scale(1.04); border-color: #adb5bd; }
+.prac-options button.correct { background: #d4edda !important; border-color: #28a745 !important; color: #155724 !important; }
+.prac-options button.wrong { background: #fce8e8 !important; border-color: #e57373 !important; color: #b71c1c !important; }
+.prac-options button:disabled { opacity: 0.7; cursor: default; transform: none; }
+.prac-score {
+  font-size: 0.75em;
+  color: #6c757d;
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  margin-top: 4px;
+}
+.prac-score strong { color: #212529; }
+.prac-next {
+  margin-top: 6px;
+  display: none;
+}
+.prac-next button {
+  font-family: Inter, sans-serif;
+  font-size: 0.75em;
+  font-weight: 700;
+  padding: 10px 28px;
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  color: white;
+  transition: all 0.12s;
+}
+.prac-next button:hover { transform: scale(1.05); }
+.prac-encourage {
+  font-size: 0.85em;
+  font-weight: 700;
+  margin-bottom: 4px;
+  min-height: 1.3em;
+}
+
+/* ─── Mixed practice ─── */
+.mixed-slide {
+  background: linear-gradient(135deg, #667eea, #764ba2) !important;
+  color: white !important;
+  display: flex !important;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.mixed-slide h2 { color: white !important; }
+.mixed-slide .v-math { background: rgba(255,255,255,0.95); }
+.mixed-slide .fact-display { background: rgba(255,255,255,0.95); color: #212529; }
+.mixed-slide .prac-score { color: rgba(255,255,255,0.7); }
+.mixed-slide .prac-score strong { color: white; }
+.mixed-slide .prac-options button { border-color: rgba(255,255,255,0.4); color: white; background: rgba(255,255,255,0.15); }
+.mixed-slide .prac-options button:hover { background: rgba(255,255,255,0.25); border-color: rgba(255,255,255,0.6); }
+.mixed-slide .prac-options button.correct { background: #d4edda !important; border-color: #28a745 !important; color: #155724 !important; }
+.mixed-slide .prac-options button.wrong { background: #fce8e8 !important; border-color: #e57373 !important; color: #b71c1c !important; }
+
+.reveal .slide-background { background: #f5f0eb; }
+.reveal .progress { height: 3px; }
+.reveal .progress span { background: #6a1b9a; }
+
+/* ─── Array / repeated addition visual ─── */
+.array-box {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  justify-content: center;
+  margin: 8px auto;
+  max-width: 300px;
+}
+.array-dot {
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.5em;
+  font-weight: 700;
+  color: white;
+}
+
+/* ─── Mobile Responsive ─── */
+@media (max-width: 768px) {
+  .prac-options button {
+    padding: 16px 24px !important;
+    font-size: 1.3em !important;
+    min-height: 52px;
+  }
+  .prac-next button {
+    padding: 14px 32px !important;
+    font-size: 1em !important;
+  }
+  .v-math {
+    padding: 8px 12px !important;
+  }
+  .v-math .v-d {
+    width: 28px !important;
+    font-size: 1em !important;
+  }
+  .v-math .v-op-sig {
+    width: 30px !important;
+  }
+  .fact-display {
+    font-size: 2em !important;
+    padding: 10px 24px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .prac-options button {
+    padding: 20px 28px !important;
+    font-size: 1.5em !important;
+    min-height: 60px;
+  }
+  .v-math .v-d {
+    width: 24px !important;
+    font-size: 0.9em !important;
+  }
+  .level-badge {
+    min-width: 48px !important;
+    height: 48px !important;
+    font-size: 1em !important;
+  }
+  .fact-display {
+    font-size: 1.6em !important;
+    padding: 8px 16px !important;
+  }
+  .array-dot {
+    width: 28px !important;
+    height: 28px !important;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="reveal">
+<div class="slides">
+
+<!-- ══════════════════════════════════════════════════ -->
+<!-- SLIDE 0: TITLE                                    -->
+<!-- ══════════════════════════════════════════════════ -->
+<section class="slide-title">
+  <h1>✖ Multiplication</h1>
+  <div class="title-divider"></div>
+  <p>Learn times tables and multi-digit multiplication</p>
+  <p style="font-size:0.6em; opacity:0.5; margin-top:20px;">Basic 3 &amp; Basic 4 • Press → to begin</p>
+</section>
+
+<!-- ══════════════════════════════════════════════════ -->
+<!-- SLIDE 1: What Is Multiplication?                   -->
+<!-- ══════════════════════════════════════════════════ -->
+<section class="slide-section" style="background:linear-gradient(135deg,#f3e5f5,#e1bee7)!important;">
+  <h2>What Is Multiplication?</h2>
+  <div style="display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin:8px 0; max-width:700px;">
+    <div style="background:white; border:2px solid #ce93d8; border-radius:12px; padding:12px 16px; max-width:220px; text-align:left; font-size:0.72em; line-height:1.6;">
+      <strong style="color:#6a1b9a; font-size:1.1em;">Repeated Addition</strong><br>
+      3 × 4 = <strong>4 + 4 + 4</strong> = 12
+    </div>
+    <div style="background:white; border:2px solid #ce93d8; border-radius:12px; padding:12px 16px; max-width:220px; text-align:left; font-size:0.72em; line-height:1.6;">
+      <strong style="color:#6a1b9a; font-size:1.1em;">Rows &amp; Columns</strong><br>
+      3 rows of 4 dots = <strong>12 dots</strong>
+    </div>
+    <div style="background:white; border:2px solid #ce93d8; border-radius:12px; padding:12px 16px; max-width:220px; text-align:left; font-size:0.72em; line-height:1.6;">
+      <strong style="color:#6a1b9a; font-size:1.1em;">Skip Counting</strong><br>
+      4, 8, 12 — count by <strong>4s</strong>
+    </div>
+  </div>
+  <p style="font-size:0.65em; color:#6c757d; max-width:500px;">
+    The <strong>first number</strong> tells you how many groups.<br>
+    The <strong>second number</strong> tells you how many in each group.
+  </p>
+</section>
+
+<!-- ══════════════════════════════════════════════════ -->
+<!-- SLIDE 2: Level 1 — Basic Facts 1-5×               -->
+<!-- ══════════════════════════════════════════════════ -->
+<section class="level-slide" data-level="fact1">
+  <div class="level-header">
+    <div class="level-badge" style="background:#8e24aa;">L1</div>
+    <div>
+      <div class="level-label">LEVEL 1 — BASIC 3</div>
+      <h2>Multiplication Facts 1× to 5×</h2>
+    </div>
+  </div>
+  <div class="fact-display" id="disp-fact1"></div>
+  <div class="prac-area">
+    <div class="prac-encourage" id="enc-fact1"></div>
+    <div class="prac-options" id="opts-fact1"></div>
+    <div class="prac-score" id="score-fact1"><span>✅ <strong>0</strong> / 0</span> <span>🎯 <strong>0%</strong></span></div>
+    <div class="prac-next" id="next-fact1">
+      <button onclick="Reveal.next()" style="background:#8e24aa;">Next Level →</button>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════ -->
+<!-- SLIDE 3: Level 2 — Basic Facts 6-9×               -->
+<!-- ══════════════════════════════════════════════════ -->
+<section class="level-slide" data-level="fact2">
+  <div class="level-header">
+    <div class="level-badge" style="background:#6a1b9a;">L2</div>
+    <div>
+      <div class="level-label">LEVEL 2 — BASIC 3</div>
+      <h2>Multiplication Facts 6× to 9×</h2>
+    </div>
+  </div>
+  <div class="fact-display" id="disp-fact2"></div>
+  <div class="prac-area">
+    <div class="prac-encourage" id="enc-fact2"></div>
+    <div class="prac-options" id="opts-fact2"></div>
+    <div class="prac-score" id="score-fact2"><span>✅ <strong>0</strong> / 0</span> <span>🎯 <strong>0%</strong></span></div>
+    <div class="prac-next" id="next-fact2">
+      <button onclick="Reveal.next()" style="background:#6a1b9a;">Next Level →</button>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════ -->
+<!-- SLIDE 4: Level 3 — 2-digit × 1-digit (No Carry)   -->
+<!-- ══════════════════════════════════════════════════ -->
+<section class="level-slide" data-level="mul2x1nc">
+  <div class="level-header">
+    <div class="level-badge" style="background:#ab47bc;">L3</div>
+    <div>
+      <div class="level-label">LEVEL 3 — BASIC 3</div>
+      <h2>2-Digit × 1-Digit (No Carry)</h2>
+    </div>
+  </div>
+  <div class="v-math" id="v-mul2x1nc"></div>
+  <p class="v-hint" id="hint-mul2x1nc" style="font-family:Inter;font-size:0.55em;color:#6c757d;max-width:400px;"></p>
+  <div class="prac-area">
+    <div class="prac-encourage" id="enc-mul2x1nc"></div>
+    <div class="prac-options" id="opts-mul2x1nc"></div>
+    <div class="prac-score" id="score-mul2x1nc"><span>✅ <strong>0</strong> / 0</span> <span>🎯 <strong>0%</strong></span></div>
+    <div class="prac-next" id="next-mul2x1nc">
+      <button onclick="Reveal.next()" style="background:#ab47bc;">Next Level →</button>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════ -->
+<!-- SLIDE 5: Level 4 — 2-digit × 1-digit (With Carry) -->
+<!-- ══════════════════════════════════════════════════ -->
+<section class="level-slide" data-level="mul2x1c">
+  <div class="level-header">
+    <div class="level-badge" style="background:#7b1fa2;">L4</div>
+    <div>
+      <div class="level-label">LEVEL 4 — BASIC 3</div>
+      <h2>2-Digit × 1-Digit (With Carry)</h2>
+    </div>
+  </div>
+  <div class="v-math" id="v-mul2x1c"></div>
+  <p class="v-hint" id="hint-mul2x1c" style="font-family:Inter;font-size:0.55em;color:#6c757d;max-width:400px;"></p>
+  <div class="prac-area">
+    <div class="prac-encourage" id="enc-mul2x1c"></div>
+    <div class="prac-options" id="opts-mul2x1c"></div>
+    <div class="prac-score" id="score-mul2x1c"><span>✅ <strong>0</strong> / 0</span> <span>🎯 <strong>0%</strong></span></div>
+    <div class="prac-next" id="next-mul2x1c">
+      <button onclick="Reveal.next()" style="background:#7b1fa2;">Next Level →</button>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════ -->
+<!-- SLIDE 6: BASIC 4 SECTION                          -->
+<!-- ══════════════════════════════════════════════════ -->
+<section class="slide-section" style="background:linear-gradient(135deg,#e8eaf6,#c5cae9)!important;">
+  <h2>📚 Basic 4 — Bigger Numbers!</h2>
+  <p style="font-size:0.7em; color:#283593; max-width:550px;">
+    Now we multiply <strong>3-digit × 1-digit</strong> and <strong>2-digit × 2-digit</strong>.<br>
+    Same steps: multiply each digit, carry, add partial products!
+  </p>
+</section>
+
+<!-- ══════════════════════════════════════════════════ -->
+<!-- SLIDE 7: Level 5 — 3-digit × 1-digit              -->
+<!-- ══════════════════════════════════════════════════ -->
+<section class="level-slide" data-level="mul3x1">
+  <div class="level-header">
+    <div class="level-badge" style="background:#283593;">L5</div>
+    <div>
+      <div class="level-label">LEVEL 5 — BASIC 4</div>
+      <h2>3-Digit × 1-Digit</h2>
+    </div>
+  </div>
+  <div class="v-math" id="v-mul3x1"></div>
+  <div class="prac-area">
+    <div class="prac-encourage" id="enc-mul3x1"></div>
+    <div class="prac-options" id="opts-mul3x1"></div>
+    <div class="prac-score" id="score-mul3x1"><span>✅ <strong>0</strong> / 0</span> <span>🎯 <strong>0%</strong></span></div>
+    <div class="prac-next" id="next-mul3x1">
+      <button onclick="Reveal.next()" style="background:#283593;">Next Level →</button>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════ -->
+<!-- SLIDE 8: Level 6 — 2-digit × 2-digit              -->
+<!-- ══════════════════════════════════════════════════ -->
+<section class="level-slide" data-level="mul2x2">
+  <div class="level-header">
+    <div class="level-badge" style="background:#1a237e;">L6</div>
+    <div>
+      <div class="level-label">LEVEL 6 — BASIC 4</div>
+      <h2>2-Digit × 2-Digit</h2>
+    </div>
+  </div>
+  <div class="v-math" id="v-mul2x2"></div>
+  <div class="prac-area">
+    <div class="prac-encourage" id="enc-mul2x2"></div>
+    <div class="prac-options" id="opts-mul2x2"></div>
+    <div class="prac-score" id="score-mul2x2"><span>✅ <strong>0</strong> / 0</span> <span>🎯 <strong>0%</strong></span></div>
+    <div class="prac-next" id="next-mul2x2">
+      <button onclick="Reveal.next()" style="background:#1a237e;">Next Level →</button>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════ -->
+<!-- SLIDE 9: MIXED PRACTICE                            -->
+<!-- ══════════════════════════════════════════════════ -->
+<section class="level-slide mixed-slide" data-level="mixed">
+  <h2 style="margin-bottom:6px; color:white!important;">🎲 Mixed Practice</h2>
+  <p style="color:rgba(255,255,255,0.8)!important; font-size:0.65em;">Questions from all levels!</p>
+  <div style="margin:6px 0;" id="disp-mixed-wrap">
+    <div class="fact-display" id="disp-mixed" style="display:none;"></div>
+    <div class="v-math" id="v-mixed" style="display:none;"></div>
+  </div>
+  <div class="prac-area">
+    <div class="prac-encourage" id="enc-mixed" style="color:rgba(255,255,255,0.9);"></div>
+    <div class="prac-options" id="opts-mixed" style="max-width:320px;"></div>
+    <div class="prac-score" id="score-mixed" style="color:rgba(255,255,255,0.7);"><span>✅ <strong style="color:white;">0</strong> / 0</span> <span>🎯 <strong style="color:white;">0%</strong></span></div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════ -->
+<!-- SLIDE 10: CLOSING                                  -->
+<!-- ══════════════════════════════════════════════════ -->
+<section class="slide-title" style="background:linear-gradient(135deg,#4a148c,#6a1b9a)!important;">
+  <h1>🌟 Well Done, Champion!</h1>
+  <div class="title-divider"></div>
+  <p>You're learning multiplication like a maths star!</p>
+  <p style="font-size:0.6em; opacity:0.6; margin-top:20px;">Practice every day — you're getting better and better! 💪</p>
+</section>
+
+</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+<script>
+const ENCOURAGE = [
+  'Great job! 🎉', 'Excellent! 🌟', 'You are so smart! 💪',
+  'Fantastic! ✨', 'Brilliant! 👏', 'You got it! 🏆',
+  'Wow, amazing! 🚀', 'Super work! 💫', 'Keep going! 🔥',
+  'Don\'t give up! 🌈', 'Try again! ⭐', 'Keep trying! 💪',
+  'Almost there! 😊',
+];
+
+const LEVEL_CONFIG = {
+  fact1:   { label: 'Facts 1-5×',    color: '#8e24aa', level: 'fact',   maxA: 5,  maxB: 5 },
+  fact2:   { label: 'Facts 6-9×',    color: '#6a1b9a', level: 'fact',   maxA: 9,  maxB: 9, minA: 6, minB: 2 },
+  mul2x1nc:{ label: '2×1 No Carry',  color: '#ab47bc', level: '2x1nc' },
+  mul2x1c: { label: '2×1 Carry',     color: '#7b1fa2', level: '2x1c' },
+  mul3x1:  { label: '3×1',           color: '#283593', level: '3x1' },
+  mul2x2:  { label: '2×2',           color: '#1a237e', level: '2x2' },
+};
+
+let scores = {};
+let currentProblems = {};
+
+function rand(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+
+function initLevel(id) {
+  if (!scores[id]) scores[id] = { correct: 0, total: 0 };
+}
+
+// ─── Problem generators ─────────────────────────────────
+function genBasicFact(maxA, maxB, minA, minB) {
+  const a = rand(minA || 0, maxA);
+  const b = rand(minB || 0, maxB);
+  return { a, b, answer: a * b, type: 'fact' };
+}
+
+function gen2x1NC() {
+  const a = rand(1,9)*10 + rand(0,9);
+  const m = rand(1, 4);
+  const ans = a * m;
+  if (String(ans).length > 3) return gen2x1NC();
+  return { a, b: m, answer: ans, type: 'multi' };
+}
+
+function gen2x1C() {
+  const a = rand(1,9)*10 + rand(0,9);
+  const m = rand(3, 7);
+  const ans = a * m;
+  if (String(ans).length > 3) return gen2x1C();
+  return { a, b: m, answer: ans, type: 'multi' };
+}
+
+function gen3x1() {
+  const a = rand(1,5)*100 + rand(0,9)*10 + rand(0,9);
+  const m = rand(2, 6);
+  const ans = a * m;
+  if (String(ans).length > 4) return gen3x1();
+  return { a, b: m, answer: ans, type: 'multi' };
+}
+
+function gen2x2() {
+  const a = rand(1,5)*10 + rand(0,9);
+  const b = rand(1,4)*10 + rand(0,9);
+  const ans = a * b;
+  if (ans > 9999) return gen2x2();
+  return { a, b, answer: ans, type: 'multi' };
+}
+
+// ─── Options generation ─────────────────────────────────
+function genOptions(correct) {
+  const opts = [correct];
+  const range = Math.max(6, Math.floor(correct * 0.25) + 1);
+  let guard = 0;
+  while (opts.length < 4 && guard < 50) {
+    guard++;
+    const d = rand(1, range);
+    const dir = Math.random() < 0.5 ? 1 : -1;
+    const w = correct + d * dir;
+    if (w > 0 && !opts.includes(w)) opts.push(w);
+  }
+  let fb = 1;
+  while (opts.length < 4) {
+    const w = correct + fb;
+    if (w > 0 && !opts.includes(w)) opts.push(w);
+    fb++;
+  }
+  for (let i = opts.length - 1; i > 0; i--) {
+    const j = rand(0, i);
+    [opts[i], opts[j]] = [opts[j], opts[i]];
+  }
+  return opts;
+}
+
+// ─── Render functions ───────────────────────────────────
+function renderFact(containerId, a, b, answer, showAnswer) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  const eq = showAnswer ? answer : '?';
+  el.innerHTML = `${a} <span class="fd-op">✖</span> ${b} <span class="fd-eq">=</span> <span style="color:${showAnswer ? '#6a1b9a' : '#adb5bd'};">${eq}</span>`;
+}
+
+function renderMulti(containerId, a, b, answer, showAnswer) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  const aStr = String(a), bStr = String(b), ansStr = String(answer);
+  const maxLen = Math.max(aStr.length, bStr.length + 1, ansStr.length);
+  const pad = Math.max(3, maxLen);
+
+  function d(n) { return `<span class="v-d">${n}</span>`; }
+
+  let html = '';
+
+  // Top number
+  html += '<div class="v-row">' + ' '.repeat(pad - aStr.length).split('').map(() => '<span class="v-d"></span>').join('');
+  html += aStr.split('').map(ch => d(ch)).join('') + '</div>';
+
+  // Second number with ×
+  html += '<div class="v-row">' + `<span class="v-op-sig">✖</span>`;
+  for (let i = 0; i < pad - bStr.length - 1; i++) html += '<span class="v-d"></span>';
+  html += bStr.split('').map(ch => d(ch)).join('') + '</div>';
+
+  // Line + answer
+  html += '<div class="v-row v-ans-row">';
+  if (!showAnswer) {
+    for (let i = 0; i < pad - 1; i++) html += '<span class="v-d"></span>';
+    html += '<span class="v-d" style="color:#6c757d;">?</span>';
+  } else {
+    for (let i = 0; i < pad - ansStr.length; i++) html += '<span class="v-d"></span>';
+    html += ansStr.split('').map(ch => `<span class="v-d" style="color:#6a1b9a;font-weight:900;">${ch}</span>`).join('');
+  }
+  html += '</div>';
+
+  el.innerHTML = html;
+}
+
+// ─── Question generation ────────────────────────────────
+function newQuestion(levelId) {
+  initLevel(levelId);
+  const cfg = LEVEL_CONFIG[levelId];
+  if (!cfg) return;
+
+  let prob;
+  if (levelId === 'mixed') {
+    const levels = Object.keys(LEVEL_CONFIG);
+    const l = levels[rand(0, levels.length - 1)];
+    const mc = LEVEL_CONFIG[l];
+    if (mc.level === 'fact') {
+      prob = genBasicFact(mc.maxA, mc.maxB, mc.minA, mc.minB);
+    } else if (mc.level === '2x1nc') prob = gen2x1NC();
+    else if (mc.level === '2x1c') prob = gen2x1C();
+    else if (mc.level === '3x1') prob = gen3x1();
+    else if (mc.level === '2x2') prob = gen2x2();
+  } else {
+    if (cfg.level === 'fact') {
+      prob = genBasicFact(cfg.maxA, cfg.maxB, cfg.minA, cfg.minB);
+    } else if (cfg.level === '2x1nc') prob = gen2x1NC();
+    else if (cfg.level === '2x1c') prob = gen2x1C();
+    else if (cfg.level === '3x1') prob = gen3x1();
+    else if (cfg.level === '2x2') prob = gen2x2();
+  }
+  if (!prob) return;
+
+  currentProblems[levelId] = prob;
+  const opts = genOptions(prob.answer);
+
+  // Render the problem
+  if (prob.type === 'fact') {
+    const dispId = levelId === 'mixed' ? 'disp-mixed' : `disp-${levelId}`;
+    const dEl = document.getElementById(dispId);
+    if (dEl) dEl.style.display = 'inline-block';
+    const vId = levelId === 'mixed' ? 'v-mixed' : `v-${levelId}`;
+    const vEl = document.getElementById(vId);
+    if (vEl) vEl.style.display = 'none';
+    renderFact(dispId, prob.a, prob.b, prob.answer, false);
+  } else {
+    const dispId = levelId === 'mixed' ? 'disp-mixed' : `disp-${levelId}`;
+    const dEl = document.getElementById(dispId);
+    if (dEl) dEl.style.display = 'none';
+    const vId = levelId === 'mixed' ? 'v-mixed' : `v-${levelId}`;
+    const vEl = document.getElementById(vId);
+    if (vEl) vEl.style.display = 'inline-block';
+    renderMulti(vId, prob.a, prob.b, prob.answer, false);
+  }
+
+  const hintEl = document.getElementById(`hint-${levelId}`);
+  if (hintEl) {
+    if (prob.type !== 'fact') {
+      if (cfg.level === '2x1c') hintEl.textContent = `💡 Multiply ${prob.b} × ${prob.a % 10} (units) first, carry, then ${prob.b} × ${Math.floor(prob.a / 10)} (tens)`;
+      else if (cfg.level === '2x1nc') hintEl.textContent = `💡 ${prob.a} × ${prob.b} = ? Multiply units first, then tens`;
+      else hintEl.textContent = '';
+    } else {
+      hintEl.textContent = '';
+    }
+  }
+
+  const optsEl = document.getElementById(`opts-${levelId}`);
+  if (optsEl) {
+    optsEl.innerHTML = opts.map((opt, i) =>
+      `<button class="prac-btn" data-answer="${prob.answer}" data-value="${opt}" onclick="checkAnswer(this, '${levelId}')">${opt}</button>`
+    ).join('');
+  }
+  updateScore(levelId);
+}
+
+function checkAnswer(btn, levelId) {
+  const answer = parseInt(btn.dataset.answer);
+  const value = parseInt(btn.dataset.value);
+  const state = scores[levelId];
+  if (!state) return;
+  if (btn.disabled) return;
+
+  state.total++;
+  const buttons = document.querySelectorAll(`#opts-${levelId} .prac-btn`);
+  const encEl = document.getElementById(`enc-${levelId}`);
+
+  const prob = currentProblems[levelId];
+
+  if (value === answer) {
+    state.correct++;
+    btn.classList.add('correct');
+    buttons.forEach(b => b.disabled = true);
+    encEl.textContent = ENCOURAGE[rand(0, 8)];
+    // Show answer
+    if (prob) {
+      if (prob.type === 'fact') {
+        const dispId = levelId === 'mixed' ? 'disp-mixed' : `disp-${levelId}`;
+        renderFact(dispId, prob.a, prob.b, prob.answer, true);
+      } else {
+        const vId = levelId === 'mixed' ? 'v-mixed' : `v-${levelId}`;
+        renderMulti(vId, prob.a, prob.b, prob.answer, true);
+      }
+    }
+    setTimeout(() => newQuestion(levelId), 500);
+  } else {
+    btn.classList.add('wrong');
+    buttons.forEach(b => {
+      if (parseInt(b.dataset.value) === answer) b.classList.add('correct');
+      b.disabled = true;
+    });
+    encEl.textContent = ENCOURAGE[rand(9, 12)];
+    setTimeout(() => newQuestion(levelId), 900);
+  }
+  updateScore(levelId);
+}
+
+function updateScore(levelId) {
+  const state = scores[levelId];
+  if (!state) return;
+  const scoreEl = document.getElementById(`score-${levelId}`);
+  if (scoreEl) {
+    const pct = state.total > 0 ? Math.round(state.correct / state.total * 100) : 0;
+    scoreEl.innerHTML = `<span>✅ <strong>${state.correct}</strong> / ${state.total}</span> <span>🎯 <strong>${pct}%</strong></span>`;
+  }
+  const nextEl = document.getElementById(`next-${levelId}`);
+  if (nextEl && state.correct >= 5) {
+    nextEl.style.display = 'block';
+  }
+}
+
+// ─── Reveal init ────────────────────────────────────────
+Reveal.initialize({
+  controls: true,
+  progress: true,
+  center: true,
+  hash: true,
+  transition: 'slide',
+  width: 960,
+  height: 700,
+});
+
+Reveal.on('slidechanged', event => {
+  const slide = event.currentSlide;
+  if (slide.classList.contains('level-slide')) {
+    const levelId = slide.dataset.level;
+    if (levelId && levelId !== 'mixed') {
+      if (!scores[levelId] || scores[levelId].total === 0) {
+        newQuestion(levelId);
+      }
+    }
+    if (levelId === 'mixed') {
+      if (!currentProblems['mixed']) newQuestion('mixed');
+    }
+  }
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(() => {
+    document.querySelectorAll('.level-slide').forEach(slide => {
+      const levelId = slide.dataset.level;
+      if (levelId && levelId !== 'mixed') initLevel(levelId);
+    });
+    const first = document.querySelector('.level-slide');
+    if (first) {
+      const id = first.dataset.level;
+      if (id && id !== 'mixed') newQuestion(id);
+    }
+  }, 300);
+});
+</script>
+</body>
+</html>

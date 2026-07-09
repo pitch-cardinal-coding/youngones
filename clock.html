@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Learn to Tell Time! — Progressive Wall Clock</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/white.css">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+:root {
+  --hour-color: #d35400;
+  --minute-color: #2980b9;
+  --face-border: #2c3e50;
+  --tick-color: #7f8c8d;
+  --big-tick-color: #34495e;
+  --num-color: #2c3e50;
+  --paper: #fdf6ec;
+  --gray: #6b7280;
+  --gray-light: #e5e7eb;
+  --bg-section: #f0ebe3;
+}
+
+* { box-sizing: border-box; }
+
+.reveal {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 24px;
+  color: var(--num-color);
+  background: var(--paper);
+}
+.reveal .slides { text-align: center; }
+.reveal .slides section { padding: 26px 36px; height: 100%; }
+.reveal h1, .reveal h2, .reveal h3 { color: var(--num-color); font-weight: 800; letter-spacing: -0.02em; }
+.reveal h1 { font-size: 2.4em; }
+.reveal h2 { font-size: 1.5em; margin-bottom: 0.35em; }
+.reveal h3 { font-size: 1.05em; font-weight: 600; margin-bottom: 0.25em; }
+.reveal p { color: var(--gray); line-height: 1.6; font-size: 0.85em; }
+.reveal ul { display: inline-block; text-align: left; font-size: 0.8em; }
+.reveal li { margin-bottom: 0.3em; color: var(--gray); }
+
+.slide-title {
+  background: linear-gradient(135deg, #2c3e50, #1a5276) !important;
+  color: white !important;
+  display: flex !important;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.slide-title h1, .slide-title h2, .slide-title p { color: white !important; }
+.slide-title h1 { font-size: 2.8em; }
+.slide-title .title-divider { width: 80px; height: 3px; background: #e67e22; margin: 0.5em auto; border-radius: 2px; }
+.slide-title .title-sub { font-size: 1em; opacity: 0.75; font-weight: 300; }
+
+.slide-section {
+  display: flex !important;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.slide-section.layer1 { background: linear-gradient(135deg, #fef9e7, #fdebd0) !important; }
+.slide-section.layer2 { background: linear-gradient(135deg, #eaf2f8, #d4e6f1) !important; }
+.slide-section h2 { font-size: 2em; font-weight: 700; }
+
+.clock-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin: 6px auto;
+}
+.clock-wrapper canvas {
+  border-radius: 50%;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.1);
+  background: white;
+}
+
+.clock-label {
+  font-size: 0.95em;
+  font-weight: 700;
+  color: var(--num-color);
+  padding: 5px 16px;
+  border: 2px solid var(--hour-color);
+  border-radius: 30px;
+  display: inline-block;
+  margin-top: 4px;
+  background: white;
+}
+
+.clock-caption {
+  font-size: 0.68em;
+  color: var(--gray);
+  max-width: 500px;
+  line-height: 1.5;
+}
+
+.controls-row {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 6px;
+}
+.controls-row button {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.68em;
+  font-weight: 600;
+  padding: 8px 20px;
+  border: 2px solid var(--num-color);
+  border-radius: 30px;
+  background: white;
+  color: var(--num-color);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.controls-row button:hover { background: var(--num-color); color: white; }
+.controls-row button:active { transform: scale(0.96); }
+.controls-row button.primary { background: var(--hour-color); color: white; border-color: var(--hour-color); }
+.controls-row button.primary:hover { background: #c0392b; border-color: #c0392b; }
+
+.highlight { color: var(--num-color); font-weight: 700; }
+
+.tip-box {
+  background: white;
+  border: 2px solid var(--gray-light);
+  border-radius: 12px;
+  padding: 12px 18px;
+  margin: 8px auto;
+  max-width: 520px;
+  font-size: 0.7em;
+  color: var(--gray);
+  line-height: 1.5;
+}
+.tip-box strong { color: var(--num-color); }
+
+.legend-row {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  align-items: center;
+  margin: 4px 0;
+  flex-wrap: wrap;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.62em;
+  font-weight: 500;
+  color: var(--gray);
+}
+.legend-swatch {
+  width: 20px; height: 6px; border-radius: 4px;
+}
+.legend-swatch.hour { background: var(--hour-color); }
+.legend-swatch.minute { background: var(--minute-color); }
+
+.answer-reveal {
+  font-size: 1.5em;
+  font-weight: 800;
+  color: var(--num-color);
+  min-height: 1.5em;
+  margin: 6px 0;
+}
+
+.reveal .slide-background { background: var(--paper); }
+.reveal .progress { background: rgba(0,0,0,0.1); height: 3px; }
+.reveal .progress span { background: var(--hour-color); }
+.reveal .controls { color: var(--num-color); }
+
+@media print {
+  .controls-row { display: none; }
+}
+
+/* ─── Mobile Responsive ─── */
+@media (max-width: 768px) {
+  .controls-row button {
+    padding: 16px 28px !important;
+    font-size: 0.9em !important;
+    border-radius: 40px !important;
+  }
+  .clock-wrapper canvas {
+    max-width: 85vw;
+    height: auto;
+  }
+  .tip-box {
+    padding: 8px 12px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .controls-row button {
+    padding: 22px 32px !important;
+    font-size: 1em !important;
+  }
+  .slide-title h1 {
+    font-size: 2em !important;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="reveal">
+<div class="slides">
+
+<!-- ══════════════════════════════════════════════════ -->
+<!-- SLIDE 0: TITLE                                    -->
+<!-- ══════════════════════════════════════════════════ -->
+<section class="slide-title" data-background-color="#2c3e50">
+  <h1>⏰ Learn to Tell Time!</h1>
+  <div class="title-divider"></div>
+  <p class="title-sub">A step-by-step guide for young learners</p>
+  <div style="margin-top:20px;">
+    <canvas id="title-clock" width="180" height="180"></canvas>
+  </div>
+  <p style="font-size:0.55em; opacity:0.5; margin-top:16px;">Press → or Space to begin</p>
+</section>
+
+<!-- ══════════════════════════════════════════════════ -->
+<!-- SLIDE 1: MEET THE CLOCK                           -->
+<!-- ══════════════════════════════════════════════════ -->
+<section>
+  <h2>Meet the Clock</h2>
+  <div class="clock-wrapper">
+    <canvas id="clock-1" width="320" height="320"></canvas>
+    <div class="legend-row">
+      <span class="legend-item"><span class="legend-swatch hour"></span> Hour hand (short)</span>
+      <span class="legend-item"><span class="legend-swatch minute"></span> Minute hand (long)</span>
+    </div>
+  </div>
+  <p class="clock-caption">A clock has two important hands. The <strong>short</strong> hand tells the <strong>hour</strong>. The <strong>long</strong> hand tells the <strong>minutes</strong>.</p>
+  <div style="margin-top:6px;">
+    <span class="tip-box" style="display:inline-block; padding:6px 16px; font-size:0.65em;">
+      💡 The numbers go from <strong>1 to 12</strong> around the clock
+    </span>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════ -->
+<!-- SLIDE 2: THE HOUR NUMBERS — 1 to 12              -->
+<!-- ══════════════════════════════════════════════════ -->
+<section class="slide-section layer1">
+  <h2>Layer 1: The Hour Numbers</h2>
+  <p style="font-size:0.75em; color:var(--gray); margin-bottom:10px;">1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 → 9 → 10 → 11 → 12</p>
+  <div class="clock-wrapper">
+    <canvas id="clock-2" width="340" height="340"></canvas>
+  </div>
+  <p class="clock-caption">The big numbers <strong>1 through 12</strong> are for <strong>hours</strong>.<br>Each new hour, the short hand moves to the next number.</p>
+</section>
+
+<!-- ══════════════════════════════════════════════════ -->
+<!-- SLIDE 3: HOUR HAND ONLY                           -->
+<!-- ══════════════════════════════════════════════════ -->
+<section>
+  <h2>The Hour Hand Moves Slowly</h2>
+  <div class="clock-wrapper">
+    <canvas id="clock-3" width="340" height="340"></canvas>
+  </div>
+  <p class="clock-caption">The <strong>short, thick hand</strong> is the hour hand.<br>It points to the <strong>hour number</strong>. Try clicking below!</p>
+  <div class="controls-row">
+    <button onclick="advance('clock-3', -1)">◀ Earlier</button>
+    <button class="primary" onclick="advance('clock-3', 1)">Next Hour ▶</button>
+  </div>
+  <div style="margin-top:8px;">
+    <span id="clock-3-time" class="clock-label">12 o'clock</span>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════ -->
+<!-- SLIDE 4: THE MINUTE NUMBERS — 1 to 60            -->
+<!-- ══════════════════════════════════════════════════ -->
+<section class="slide-section layer2">
+  <h2>Layer 2: The Minute Numbers</h2>
+  <p style="font-size:0.75em; color:var(--gray); margin-bottom:10px;">Each tiny step = 1 minute &nbsp;·&nbsp; 60 steps = 1 hour</p>
+  <div class="clock-wrapper">
+    <canvas id="clock-4" width="340" height="340"></canvas>
+  </div>
+  <p class="clock-caption">Between each hour number, there are <strong>5 little minutes</strong>.<br>
+  5 × 12 = <strong>60 minutes</strong> in one full circle!</p>
+</section>
+
+<!-- ══════════════════════════════════════════════════ -->
+<!-- SLIDE 5: TWO LAYERS TOGETHER                     -->
+<!-- ══════════════════════════════════════════════════ -->
+<section>
+  <h2>Two Layers on One Clock</h2>
+  <div class="clock-wrapper">
+    <canvas id="clock-5" width="340" height="340"></canvas>
+  </div>
+  <div class="tip-box">
+    <strong>🤔 Tricky!</strong> The number <strong>1</strong> means two things:<br>
+    • <strong>1 o'clock</strong> (hour hand)<br>
+    • <strong>5 minutes</strong> (minute hand)<br><br>
+    That's why you need <strong>both layers</strong>!
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════ -->
+<!-- SLIDE 6: O'CLOCK                                  -->
+<!-- ══════════════════════════════════════════════════ -->
+<section>
+  <h2>O'Clock: When the Minute Hand is at 12</h2>
+  <div class="clock-wrapper">
+    <canvas id="clock-6" width="340" height="340"></canvas>
+  </div>
+  <p class="clock-caption">When the <strong>long hand points to 12</strong>, it's exactly <strong>o'clock</strong>.<br>Read the hour number where the short hand points.</p>
+  <div class="controls-row">
+    <button onclick="advance('clock-6', -1)">◀ Earlier</button>
+    <button class="primary" onclick="advance('clock-6', 1)">Next Hour ▶</button>
+  </div>
+  <div style="margin-top:8px;">
+    <span id="clock-6-time" class="clock-label">3 o'clock</span>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════ -->
+<!-- SLIDE 7: HALF PAST                                -->
+<!-- ══════════════════════════════════════════════════ -->
+<section>
+  <h2>Half Past: Minute Hand at 6</h2>
+  <div class="clock-wrapper">
+    <canvas id="clock-7" width="340" height="340"></canvas>
+  </div>
+  <p class="clock-caption">When the <strong>long hand points to 6</strong> (30 minutes), we say <strong>"half past"</strong>.<br>The short hand is halfway between two numbers.</p>
+  <div class="controls-row">
+    <button onclick="advance('clock-7', -1)">◀ Earlier</button>
+    <button class="primary" onclick="advance('clock-7', 1)">Next Half Hour ▶</button>
+  </div>
+  <div style="margin-top:8px;">
+    <span id="clock-7-time" class="clock-label">half past 3</span>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════ -->
+<!-- SLIDE 8: QUARTER PAST                             -->
+<!-- ══════════════════════════════════════════════════ -->
+<section>
+  <h2>Quarter Past: Minute Hand at 3</h2>
+  <div class="clock-wrapper">
+    <canvas id="clock-8" width="340" height="340"></canvas>
+  </div>
+  <p class="clock-caption">When the <strong>long hand points to 3</strong> (15 minutes), we say <strong>"quarter past"</strong>.<br>
+  15 minutes is one quarter of an hour.</p>
+  <div class="controls-row">
+    <button onclick="advance('clock-8', -1)">◀ Earlier</button>
+    <button class="primary" onclick="advance('clock-8', 1)">Next Quarter ▶</button>
+  </div>
+  <div style="margin-top:8px;">
+    <span id="clock-8-time" class="clock-label">quarter past 3</span>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════ -->
+<!-- SLIDE 9: QUARTER TO                               -->
+<!-- ══════════════════════════════════════════════════ -->
+<section>
+  <h2>Quarter To: Minute Hand at 9</h2>
+  <div class="clock-wrapper">
+    <canvas id="clock-9" width="340" height="340"></canvas>
+  </div>
+  <p class="clock-caption">When the <strong>long hand points to 9</strong> (45 minutes), we say <strong>"quarter to"</strong> the next hour.<br>
+  15 minutes left until the next hour!</p>
+  <div class="controls-row">
+    <button onclick="advance('clock-9', -1)">◀ Earlier</button>
+    <button class="primary" onclick="advance('clock-9', 1)">Next Quarter ▶</button>
+  </div>
+  <div style="margin-top:8px;">
+    <span id="clock-9-time" class="clock-label">quarter to 4</span>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════ -->
+<!-- SLIDE 10: COUNTING BY FIVES                       -->
+<!-- ══════════════════════════════════════════════════ -->
+<section>
+  <h2>Count by Fives for Minutes</h2>
+  <div class="clock-wrapper">
+    <canvas id="clock-10" width="340" height="340"></canvas>
+  </div>
+  <p class="clock-caption">Use the <strong>hour numbers</strong> to count minutes by <strong>fives</strong>!<br>
+  1 = :05 &nbsp;·&nbsp; 2 = :10 &nbsp;·&nbsp; 3 = :15 &nbsp;·&nbsp; 4 = :20 &nbsp;·&nbsp; 5 = :25 &nbsp;·&nbsp; 6 = :30<br>
+  7 = :35 &nbsp;·&nbsp; 8 = :40 &nbsp;·&nbsp; 9 = :45 &nbsp;·&nbsp; 10 = :50 &nbsp;·&nbsp; 11 = :55 &nbsp;·&nbsp; 12 = :00</p>
+  <div class="controls-row">
+    <button class="primary" onclick="advance('clock-10', 5)">+5 minutes</button>
+    <button onclick="advance('clock-10', -5)">-5 minutes</button>
+  </div>
+  <div style="margin-top:8px;">
+    <span id="clock-10-time" class="clock-label">1:05</span>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════ -->
+<!-- SLIDE 11: THE 5× TABLE CONNECTION                 -->
+<!-- ══════════════════════════════════════════════════ -->
+<section>
+  <h2 style="margin-bottom:8px;">The 5× Table = Telling Time!</h2>
+  <div style="display:flex; gap:16px; align-items:start; justify-content:center;">
+    <canvas id="clock-5x" width="200" height="200" style="flex-shrink:0; margin-top:4px;"></canvas>
+    <div style="display:flex; gap:10px;">
+      <table style="font-size:0.55em; border-collapse:collapse;">
+        <thead>
+          <tr><th style="text-align:center; padding:3px 8px; background:#2c3e50; color:white;">×</th><th style="text-align:center; padding:3px 8px; background:#2c3e50; color:white;">#</th><th style="text-align:center; padding:3px 8px; background:#2c3e50; color:white;">Min</th></tr>
+        </thead>
+        <tbody>
+          <tr><td style="text-align:center; padding:2px 8px;">5×1</td><td style="text-align:center; padding:2px 8px; font-weight:700;">1</td><td style="text-align:center; padding:2px 8px;">:05</td></tr>
+          <tr><td style="text-align:center; padding:2px 8px;">5×2</td><td style="text-align:center; padding:2px 8px; font-weight:700;">2</td><td style="text-align:center; padding:2px 8px;">:10</td></tr>
+          <tr><td style="text-align:center; padding:2px 8px;">5×3</td><td style="text-align:center; padding:2px 8px; font-weight:700;">3</td><td style="text-align:center; padding:2px 8px;">:15</td></tr>
+          <tr><td style="text-align:center; padding:2px 8px;">5×4</td><td style="text-align:center; padding:2px 8px; font-weight:700;">4</td><td style="text-align:center; padding:2px 8px;">:20</td></tr>
+          <tr><td style="text-align:center; padding:2px 8px;">5×5</td><td style="text-align:center; padding:2px 8px; font-weight:700;">5</td><td style="text-align:center; padding:2px 8px;">:25</td></tr>
+          <tr><td style="text-align:center; padding:2px 8px;">5×6</td><td style="text-align:center; padding:2px 8px; font-weight:700;">6</td><td style="text-align:center; padding:2px 8px;">:30</td></tr>
+        </tbody>
+      </table>
+      <table style="font-size:0.55em; border-collapse:collapse;">
+        <thead>
+          <tr><th style="text-align:center; padding:3px 8px; background:#2c3e50; color:white;">×</th><th style="text-align:center; padding:3px 8px; background:#2c3e50; color:white;">#</th><th style="text-align:center; padding:3px 8px; background:#2c3e50; color:white;">Min</th></tr>
+        </thead>
+        <tbody>
+          <tr><td style="text-align:center; padding:2px 8px;">5×7</td><td style="text-align:center; padding:2px 8px; font-weight:700;">7</td><td style="text-align:center; padding:2px 8px;">:35</td></tr>
+          <tr><td style="text-align:center; padding:2px 8px;">5×8</td><td style="text-align:center; padding:2px 8px; font-weight:700;">8</td><td style="text-align:center; padding:2px 8px;">:40</td></tr>
+          <tr><td style="text-align:center; padding:2px 8px;">5×9</td><td style="text-align:center; padding:2px 8px; font-weight:700;">9</td><td style="text-align:center; padding:2px 8px;">:45</td></tr>
+          <tr><td style="text-align:center; padding:2px 8px;">5×10</td><td style="text-align:center; padding:2px 8px; font-weight:700;">10</td><td style="text-align:center; padding:2px 8px;">:50</td></tr>
+          <tr><td style="text-align:center; padding:2px 8px;">5×11</td><td style="text-align:center; padding:2px 8px; font-weight:700;">11</td><td style="text-align:center; padding:2px 8px;">:55</td></tr>
+          <tr style="background:#e5e7eb;"><td style="text-align:center; padding:2px 8px; font-weight:700;">5×12</td><td style="text-align:center; padding:2px 8px; font-weight:700;">12</td><td style="text-align:center; padding:2px 8px;">:00</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="tip-box" style="margin-top:6px; padding:8px 14px; font-size:0.62em;">
+    <strong>🧠 The Secret!</strong> If you know your <strong>5× table</strong>, you already know the minutes!<br>
+    Just <strong>multiply the clock number by 5</strong>. Example: hand at 7 → 5×7 = <strong>35 minutes</strong> past
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════ -->
+<!-- SLIDE 11: ANY TIME                                -->
+<!-- ══════════════════════════════════════════════════ -->
+<section>
+  <h2>Putting It All Together</h2>
+  <div class="clock-wrapper">
+    <canvas id="clock-11" width="340" height="340"></canvas>
+  </div>
+  <p class="clock-caption">Read the <strong>hour number</strong> (or between numbers), then count the <strong>minutes</strong>.<br>
+  <span class="highlight">Short hand → hour &nbsp;·&nbsp; Long hand → minutes</span></p>
+  <div class="controls-row">
+    <button onclick="advance('clock-11', -1)">-1 min</button>
+    <button class="primary" onclick="advance('clock-11', 1)">+1 min</button>
+    <button onclick="advance('clock-11', 5)">+5 min</button>
+    <button onclick="advance('clock-11', 15)">+15 min</button>
+    <button onclick="randomTime('clock-11')">🎲 Random</button>
+  </div>
+  <div style="margin-top:8px;">
+    <span id="clock-11-time" class="clock-label">1:07</span>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════ -->
+<!-- SLIDE 12: PRACTICE — GUESS THE TIME              -->
+<!-- ══════════════════════════════════════════════════ -->
+<section>
+  <h2>✏️ Practice Time!</h2>
+  <div class="clock-wrapper">
+    <canvas id="clock-12" width="320" height="320"></canvas>
+  </div>
+  <div id="clock-12-answer" class="answer-reveal">❓</div>
+  <div class="controls-row">
+    <button class="primary" onclick="newPracticeTime()">🎲 New Time</button>
+    <button onclick="showPracticeAnswer()">👀 Show Answer</button>
+  </div>
+  <p class="clock-caption" style="font-size:0.65em;">Look at the clock. Try to read the time. Then click <strong>"Show Answer"</strong> to check!</p>
+</section>
+
+<!-- ══════════════════════════════════════════════════ -->
+<!-- SLIDE 13: WELL DONE!                              -->
+<!-- ══════════════════════════════════════════════════ -->
+<section class="slide-title" data-background-color="#2c3e50">
+  <h1>🌟 Well Done!</h1>
+  <div class="title-divider"></div>
+  <p class="title-sub">You're learning to tell time!</p>
+  <div style="margin-top:20px;">
+    <canvas id="end-clock" width="180" height="180"></canvas>
+  </div>
+  <p style="font-size:0.55em; opacity:0.5; margin-top:16px;">Keep practicing every day ⏰</p>
+</section>
+
+</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+<script>
+// ─── Reveal init ──────────────────────────────────────
+Reveal.initialize({
+  controls: true,
+  progress: true,
+  center: true,
+  hash: true,
+  transition: 'slide',
+  backgroundTransition: 'fade',
+  width: 960,
+  height: 700,
+});
+
+// ─── Clock state ──────────────────────────────────────
+const state = {};
+const configs = {};
+
+function initClock(id, opts) {
+  const defaults = {
+    hours: 3,
+    minutes: 0,
+    showHourHand: true,
+    showMinuteHand: true,
+    showHourNumbers: true,
+    showMinuteTicks: true,
+    showMinuteLabels: false,
+    showLabels: false,
+    hourOnlyMode: false,
+    minuteOnlyMode: false,
+    highlightHour: null,
+    highlightMinuteGroup: null,
+    showBothLayers: false,
+    layer1Only: false,
+    layer2Only: false,
+    showFiveHighlight: false,
+  };
+  configs[id] = { ...defaults, ...opts };
+  state[id] = { hours: configs[id].hours, minutes: configs[id].minutes };
+}
+
+// ─── Drawing engine ───────────────────────────────────
+function drawClock(id) {
+  const canvas = document.getElementById(id);
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const cx = W / 2, cy = H / 2;
+  const radius = Math.min(cx, cy) - 16;
+  const cfg = configs[id];
+  const st = state[id];
+
+  const HOUR_COLOR = '#d35400';
+  const MINUTE_COLOR = '#2980b9';
+  const FACE_BORDER = '#2c3e50';
+  const NUM_COLOR = '#2c3e50';
+  const TICK_COLOR = '#95a5a6';
+  const BIG_TICK_COLOR = '#34495e';
+
+  ctx.clearRect(0, 0, W, H);
+
+  // Face
+  ctx.beginPath();
+  ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+  ctx.strokeStyle = FACE_BORDER;
+  ctx.lineWidth = 2.5;
+  ctx.stroke();
+
+  // Inner decorative ring
+  ctx.beginPath();
+  ctx.arc(cx, cy, radius * 0.88, 0, Math.PI * 2);
+  ctx.strokeStyle = '#d5dbdb';
+  ctx.lineWidth = 1;
+  ctx.stroke();
+
+  // ─── LAYER 1: Hour numbers (1–12) ──────────────────
+  if (cfg.showHourNumbers) {
+    const hourRadius = radius * 0.78;
+    for (let i = 1; i <= 12; i++) {
+      const angle = (i / 12) * Math.PI * 2 - Math.PI / 2;
+      const x = cx + Math.cos(angle) * hourRadius;
+      const y = cy + Math.sin(angle) * hourRadius;
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.fillStyle = NUM_COLOR;
+      ctx.font = 'bold ' + (cfg.layer1Only ? Math.round(radius * 0.24) + 'px' : Math.round(radius * 0.16) + 'px') + ' Inter, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      if (cfg.highlightHour === i) {
+        ctx.fillStyle = HOUR_COLOR;
+        ctx.beginPath();
+        ctx.arc(0, 0, radius * 0.11, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = 'white';
+        ctx.fillText(String(i), 0, 1);
+      } else {
+        ctx.fillText(String(i), 0, 1);
+      }
+      ctx.restore();
+    }
+  }
+
+  // ─── LAYER 2: Minute marks and numbers ──────────────
+  if (cfg.showMinuteTicks) {
+    const tickOuter = cfg.layer2Only ? radius * 0.78 : radius * 0.88;
+    const tickInner = cfg.layer2Only ? radius * 0.70 : radius * 0.74;
+    const bigTickOuter = cfg.layer2Only ? radius * 0.78 : radius * 0.88;
+    const bigTickInner = cfg.layer2Only ? radius * 0.65 : radius * 0.68;
+
+    for (let m = 0; m < 60; m++) {
+      const angle = (m / 60) * Math.PI * 2 - Math.PI / 2;
+      const isBig = m % 5 === 0;
+      const outer = isBig ? bigTickOuter : tickOuter;
+      const inner = isBig ? bigTickInner : tickInner;
+      const x1 = cx + Math.cos(angle) * inner;
+      const y1 = cy + Math.sin(angle) * inner;
+      const x2 = cx + Math.cos(angle) * outer;
+      const y2 = cy + Math.sin(angle) * outer;
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2, y2);
+      ctx.strokeStyle = isBig ? BIG_TICK_COLOR : TICK_COLOR;
+      ctx.lineWidth = isBig ? 2 : 1;
+      ctx.stroke();
+    }
+
+    // Minute number labels (every 5)
+    if (cfg.showMinuteTicks) {
+      const labelRadius = cfg.layer2Only ? radius * 0.58 : radius * 0.58;
+      const labelBold = cfg.showFiveHighlight;
+      for (let m = 5; m <= 60; m += 5) {
+        const i = m / 5;
+        const angle = (i / 12) * Math.PI * 2 - Math.PI / 2;
+        const x = cx + Math.cos(angle) * labelRadius;
+        const y = cy + Math.sin(angle) * labelRadius;
+        ctx.save();
+        ctx.translate(x, y);
+
+        if (labelBold) {
+          ctx.fillStyle = BIG_TICK_COLOR;
+          ctx.font = 'bold ' + Math.round(radius * 0.11) + 'px Inter, sans-serif';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(String(m), 0, 1);
+        } else {
+          ctx.fillStyle = '#95a5a6';
+          ctx.font = Math.round(radius * 0.09) + 'px Inter, sans-serif';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(String(m), 0, 1);
+        }
+        ctx.restore();
+      }
+    }
+  }
+
+  // ─── Layer labels ──────────────────────────────────
+  if (cfg.showLabels) {
+    ctx.save();
+    ctx.fillStyle = HOUR_COLOR;
+    ctx.font = 'bold 11px Inter, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('Layer 1: Hours 1-12', cx, cy + radius * 0.45);
+    ctx.fillStyle = MINUTE_COLOR;
+    ctx.font = '11px Inter, sans-serif';
+    ctx.fillText('Layer 2: Minutes 1-60', cx, cy + radius * 0.50);
+    ctx.restore();
+  }
+
+  // ─── Hands ──────────────────────────────────────────
+  const minutesAngle = (st.minutes / 60) * Math.PI * 2;
+  const hoursAngle = ((st.hours % 12 + st.minutes / 60) / 12) * Math.PI * 2;
+
+  // Hour hand
+  if (cfg.showHourHand) {
+    const hLen = radius * 0.45;
+    const hWidth = radius * 0.06;
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(hoursAngle);
+    ctx.beginPath();
+    ctx.moveTo(-hWidth * 0.3, -hWidth * 0.3);
+    ctx.lineTo(-hWidth * 0.3, -hLen);
+    ctx.lineTo(0, -hLen - radius * 0.06);
+    ctx.lineTo(hWidth * 0.3, -hLen);
+    ctx.lineTo(hWidth * 0.3, -hWidth * 0.3);
+    ctx.closePath();
+    ctx.fillStyle = HOUR_COLOR;
+    ctx.fill();
+    // Center dot
+    ctx.beginPath();
+    ctx.arc(0, 0, radius * 0.04, 0, Math.PI * 2);
+    ctx.fillStyle = HOUR_COLOR;
+    ctx.fill();
+    ctx.restore();
+  }
+
+  // Minute hand
+  if (cfg.showMinuteHand) {
+    const mLen = radius * 0.70;
+    const mWidth = radius * 0.03;
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(minutesAngle);
+    ctx.beginPath();
+    ctx.moveTo(-mWidth * 0.3, -mWidth * 0.3);
+    ctx.lineTo(-mWidth * 0.3, -mLen);
+    ctx.lineTo(0, -mLen - radius * 0.04);
+    ctx.lineTo(mWidth * 0.3, -mLen);
+    ctx.lineTo(mWidth * 0.3, -mWidth * 0.3);
+    ctx.closePath();
+    ctx.fillStyle = MINUTE_COLOR;
+    ctx.globalAlpha = 0.85;
+    ctx.fill();
+    ctx.globalAlpha = 1;
+    // Center dot
+    ctx.beginPath();
+    ctx.arc(0, 0, radius * 0.025, 0, Math.PI * 2);
+    ctx.fillStyle = MINUTE_COLOR;
+    ctx.fill();
+    ctx.restore();
+  }
+
+  // Update time label if present
+  const label = document.getElementById(id + '-time');
+  if (label) {
+    const isWordy = id === 'clock-6' || id === 'clock-7' || id === 'clock-8' || id === 'clock-9';
+    label.textContent = isWordy ? formatTimeWords(st.hours, st.minutes) : formatTime(st.hours, st.minutes);
+  }
+}
+
+// ─── Time formatting ──────────────────────────────────
+function formatTime(h, m) {
+  const hour = ((h % 12) || 12);
+  const minStr = String(m).padStart(2, '0');
+  const ampm = h < 12 || h === 24 ? 'AM' : 'PM';
+  const h12 = h % 12 || 12;
+  return `${h12}:${minStr} ${ampm}`;
+}
+
+function formatTimeWords(h, m) {
+  const hour = ((h % 12) || 12);
+  const nextHour = ((h % 12) + 1) || 1;
+  if (m === 0) return `${hour} o'clock`;
+  if (m === 15) return `quarter past ${hour}`;
+  if (m === 30) return `half past ${hour}`;
+  if (m === 45) return `quarter to ${nextHour}`;
+  return formatTime(h, m);
+}
+
+// ─── Controls ─────────────────────────────────────────
+function advance(id, delta) {
+  const st = state[id];
+  const cfg = configs[id];
+
+  if (id === 'clock-3') {
+    st.hours = ((st.hours + delta - 1 + 12) % 12) + 1;
+    st.minutes = 0;
+  } else if (id === 'clock-6') {
+    st.hours = ((st.hours + delta - 1 + 12) % 12) + 1;
+    st.minutes = 0;
+  } else if (id === 'clock-7') {
+    st.hours = ((st.hours + delta - 1 + 12) % 12) + 1;
+    st.minutes = 30;
+  } else if (id === 'clock-8') {
+    st.hours = ((st.hours + delta - 1 + 12) % 12) + 1;
+    st.minutes = 15;
+  } else if (id === 'clock-9') {
+    st.hours = ((st.hours + delta - 1 + 12) % 12) + 1;
+    st.minutes = 45;
+  } else if (id === 'clock-10') {
+    st.minutes = ((st.minutes + delta) % 60 + 60) % 60;
+    if (delta > 0 && st.minutes < delta) st.hours = (st.hours % 12) + 1;
+    if (delta < 0 && st.minutes >= 60 + delta) st.hours = ((st.hours - 2 + 12) % 12) + 1;
+  } else if (id === 'clock-11') {
+    st.minutes = ((st.minutes + delta) % 60 + 60) % 60;
+    if (delta > 0 && st.minutes < delta) st.hours = (st.hours % 12) + 1;
+    if (delta < 0 && st.minutes >= 60 + delta) st.hours = ((st.hours - 2 + 12) % 12) + 1;
+  }
+  drawClock(id);
+}
+
+function randomTime(id) {
+  const st = state[id];
+  st.hours = Math.floor(Math.random() * 12) + 1;
+  st.minutes = Math.floor(Math.random() * 60);
+  drawClock(id);
+}
+
+// ─── Practice slide ───────────────────────────────────
+let practiceAnswerVisible = false;
+const practiceState = { hours: 3, minutes: 15 };
+
+function newPracticeTime() {
+  practiceState.hours = Math.floor(Math.random() * 12) + 1;
+  practiceState.minutes = Math.floor(Math.random() * 60);
+  state['clock-12'] = { ...practiceState };
+  practiceAnswerVisible = false;
+  document.getElementById('clock-12-answer').textContent = '❓';
+  drawClock('clock-12');
+}
+
+function showPracticeAnswer() {
+  if (!practiceAnswerVisible) {
+    const words = formatTimeWords(practiceState.hours, practiceState.minutes);
+    const numeric = formatTime(practiceState.hours, practiceState.minutes);
+    document.getElementById('clock-12-answer').textContent = words === numeric ? words : `${words} = ${numeric}`;
+    practiceAnswerVisible = true;
+  } else {
+    document.getElementById('clock-12-answer').textContent = '❓';
+    practiceAnswerVisible = false;
+  }
+}
+
+// ─── Initialize all clocks ────────────────────────────
+initClock('title-clock', {
+  hours: 10, minutes: 10,
+  showMinuteLabels: true,
+  showHourNumbers: true,
+  showMinuteTicks: true,
+  showLabels: false,
+});
+
+initClock('clock-1', {
+  hours: 3, minutes: 0,
+  showHourNumbers: true, showMinuteTicks: true,
+  showMinuteLabels: false,
+  showLabels: false,
+});
+
+initClock('clock-2', {
+  hours: 12, minutes: 0,
+  showHourHand: true, showMinuteHand: false,
+  showHourNumbers: true, showMinuteTicks: false,
+  showMinuteLabels: false,
+  layer1Only: true,
+});
+
+initClock('clock-3', {
+  hours: 12, minutes: 0,
+  showHourHand: true, showMinuteHand: false,
+  showHourNumbers: true, showMinuteTicks: false,
+  showMinuteLabels: false,
+});
+
+initClock('clock-4', {
+  hours: 12, minutes: 0,
+  showHourHand: false, showMinuteHand: false,
+  showHourNumbers: false, showMinuteTicks: true,
+  showMinuteLabels: false,
+  layer2Only: true,
+});
+
+initClock('clock-5', {
+  hours: 10, minutes: 52,
+  showHourNumbers: true, showMinuteTicks: true,
+  showMinuteLabels: false,
+  showLabels: true,
+});
+
+initClock('clock-6', {
+  hours: 1, minutes: 0,
+  showHourNumbers: true, showMinuteTicks: true,
+  showMinuteLabels: false,
+});
+
+initClock('clock-7', {
+  hours: 1, minutes: 30,
+  showHourNumbers: true, showMinuteTicks: true,
+  showMinuteLabels: false,
+});
+
+initClock('clock-8', {
+  hours: 1, minutes: 15,
+  showHourNumbers: true, showMinuteTicks: true,
+  showMinuteLabels: false,
+});
+
+initClock('clock-9', {
+  hours: 1, minutes: 45,
+  showHourNumbers: true, showMinuteTicks: true,
+  showMinuteLabels: false,
+});
+
+initClock('clock-10', {
+  hours: 1, minutes: 5,
+  showHourNumbers: true, showMinuteTicks: true,
+  showMinuteLabels: false,
+});
+
+initClock('clock-5x', {
+  hours: 4, minutes: 20,
+  showHourNumbers: true, showMinuteTicks: true,
+  showMinuteLabels: false,
+  showFiveHighlight: true,
+});
+
+initClock('clock-11', {
+  hours: 1, minutes: 7,
+  showHourNumbers: true, showMinuteTicks: true,
+  showMinuteLabels: false,
+});
+
+state['clock-12'] = { hours: 8, minutes: 20 };
+initClock('clock-12', {
+  hours: 8, minutes: 20,
+  showHourNumbers: true, showMinuteTicks: true,
+  showMinuteLabels: false,
+});
+
+initClock('end-clock', {
+  hours: 12, minutes: 0,
+  showHourNumbers: true, showMinuteTicks: true,
+  showMinuteLabels: false,
+});
+
+// ─── Draw on slide change ─────────────────────────────
+Reveal.on('slidechanged', event => {
+  // Redraw all visible clocks (handles canvas repaint after reveal transitions)
+  const canvases = document.querySelectorAll('canvas');
+  canvases.forEach(c => drawClock(c.id));
+});
+
+// ─── Initial draw ─────────────────────────────────────
+document.querySelectorAll('canvas').forEach(c => drawClock(c.id));
+
+// ─── Rerender on resize ───────────────────────────────
+window.addEventListener('resize', () => {
+  document.querySelectorAll('canvas').forEach(c => drawClock(c.id));
+});
+</script>
+</body>
+</html>

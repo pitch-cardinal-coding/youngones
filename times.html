@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Times Tables — Learn Multiplication 2× to 20×</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/white.css">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+.reveal {
+  font-family: 'Inter', sans-serif;
+  font-size: 20px;
+  background: #f7f5f0;
+}
+.reveal .slides { text-align: center; }
+
+.slide-title {
+  background: linear-gradient(135deg, #1a1a3e, #2c3e50, #1a5276) !important;
+  color: white !important;
+  display: flex !important;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 40px !important;
+}
+.slide-title h1 { color: white !important; font-size: 2.6em; font-weight: 900; letter-spacing: -0.03em; }
+.slide-title .divider { width: 80px; height: 4px; background: #e94560; margin: 0.5em auto; border-radius: 2px; }
+.slide-title p { color: rgba(255,255,255,0.7) !important; font-size: 1em; font-weight: 300; }
+
+.slide-close {
+  background: linear-gradient(135deg, #1a5276, #1a1a3e) !important;
+  color: white !important;
+  display: flex !important;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.slide-close h1 { color: white !important; }
+
+.table-slide {
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 16px 30px !important;
+}
+
+.table-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+.table-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  font-size: 1.6em;
+  font-weight: 900;
+  color: white;
+  flex-shrink: 0;
+}
+.table-header h2 {
+  margin: 0;
+  font-size: 1.4em;
+  font-weight: 800;
+}
+
+.table-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3px 24px;
+  margin: 6px 0;
+}
+.table-fact {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78em;
+  padding: 3px 10px;
+  border-radius: 6px;
+  background: white;
+  border: 1px solid #e9ecef;
+  transition: all 0.15s;
+}
+.table-fact .tf-op { color: #6c757d; }
+.table-fact .tf-eq { color: #adb5bd; }
+.table-fact .tf-ans { font-weight: 700; }
+
+.practice-area {
+  margin-top: 6px;
+  width: 100%;
+  max-width: 500px;
+}
+.practice-question {
+  font-size: 1.5em;
+  font-weight: 800;
+  min-height: 1.6em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.practice-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin: 6px 0;
+}
+.opt-btn {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.95em;
+  font-weight: 700;
+  padding: 8px 12px;
+  border: 2px solid #dee2e6;
+  border-radius: 10px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.12s;
+}
+.opt-btn:hover { transform: scale(1.03); border-color: #adb5bd; }
+.opt-btn.correct { background: #d4edda !important; border-color: #28a745 !important; color: #155724 !important; }
+.opt-btn.wrong { background: #fce8e8 !important; border-color: #e57373 !important; color: #b71c1c !important; }
+
+.mixed-bg .opt-btn { border-color: rgba(255,255,255,0.4); color: white; background: rgba(255,255,255,0.1); }
+.mixed-bg .opt-btn:hover { background: rgba(255,255,255,0.2); border-color: rgba(255,255,255,0.6); }
+.mixed-bg .opt-btn.correct { background: #d4edda !important; border-color: #28a745 !important; color: #155724 !important; }
+.mixed-bg .opt-btn.wrong { background: #fce8e8 !important; border-color: #e57373 !important; color: #b71c1c !important; }
+
+.practice-score {
+  font-size: 0.75em;
+  color: #6c757d;
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  margin-top: 4px;
+}
+.practice-score strong { color: #212529; }
+
+.skip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  justify-content: center;
+  margin: 4px 0;
+}
+.skip-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  font-size: 0.6em;
+  font-weight: 700;
+  color: white;
+  transition: all 0.2s;
+}
+
+.reveal .slide-background { background: #f7f5f0; }
+.reveal .progress { height: 3px; }
+.reveal .controls { }
+
+/* ─── Practice slides ─────────────────────────────── */
+.practice-slide {
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 30px !important;
+}
+.p-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.p-question {
+  font-size: 2em;
+  font-weight: 800;
+  min-height: 1.4em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: white;
+  border: 2px solid #dee2e6;
+  border-radius: 16px;
+  padding: 10px 40px;
+  margin: 4px 0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+.p-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  max-width: 360px;
+  margin: 6px 0;
+}
+.p-opt-btn {
+  font-family: 'Inter', sans-serif;
+  font-size: 1.3em;
+  font-weight: 700;
+  padding: 14px 20px;
+  border: 3px solid #dee2e6;
+  border-radius: 14px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.12s;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+}
+.p-opt-btn:hover { transform: scale(1.04); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+.p-opt-btn.correct { background: #d4edda !important; border-color: #28a745 !important; color: #155724 !important; }
+.p-opt-btn.wrong { background: #fce8e8 !important; border-color: #e57373 !important; color: #b71c1c !important; }
+.p-opt-btn:disabled { opacity: 0.7; cursor: default; transform: none; }
+.p-stats {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  font-size: 0.8em;
+  color: #6c757d;
+  margin-top: 6px;
+}
+.p-stats strong { color: #212529; }
+.p-next {
+  margin-top: 6px;
+  text-align: center;
+}
+
+/* ─── Mobile Responsive ─── */
+@media (max-width: 768px) {
+  .opt-btn, .p-opt-btn {
+    padding: 16px 24px !important;
+    font-size: 1.3em !important;
+    min-height: 52px;
+  }
+  .skip-num {
+    width: 44px !important;
+    height: 44px !important;
+    font-size: 0.9em !important;
+  }
+  .table-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .practice-options {
+    max-width: 100% !important;
+  }
+  .practice-question {
+    font-size: 1.8em !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .opt-btn, .p-opt-btn {
+    padding: 20px 28px !important;
+    font-size: 1.5em !important;
+    min-height: 60px;
+  }
+  .table-fact {
+    font-size: 1em !important;
+    padding: 6px 14px !important;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="reveal">
+<div class="slides">
+
+<section class="slide-title">
+  <h1>✖ Times Tables</h1>
+  <div class="divider"></div>
+  <p>Learn multiplication <strong style="color:#e94560;">2×</strong> through <strong style="color:#e94560;">20×</strong></p>
+  <p style="font-size:0.65em; opacity:0.5; margin-top:20px;">Press → or Space to begin</p>
+</section>
+
+<section>
+  <h2 style="margin-bottom:6px;">What Is Multiplication?</h2>
+  <div style="display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin:8px 0;">
+    <div style="background:#fff; border:2px solid #e9ecef; border-radius:12px; padding:12px 16px; max-width:240px; text-align:left; font-size:0.72em; line-height:1.6;">
+      <strong style="color:#e74c3c; font-size:1.1em;">Repeated Addition</strong><br>
+      3 × 4 = <strong>4 + 4 + 4</strong> = 12
+    </div>
+    <div style="background:#fff; border:2px solid #e9ecef; border-radius:12px; padding:12px 16px; max-width:240px; text-align:left; font-size:0.72em; line-height:1.6;">
+      <strong style="color:#3498db; font-size:1.1em;">Rows &amp; Columns</strong><br>
+      3 rows of 4 dots = <strong>12</strong>
+    </div>
+    <div style="background:#fff; border:2px solid #e9ecef; border-radius:12px; padding:12px 16px; max-width:240px; text-align:left; font-size:0.72em; line-height:1.6;">
+      <strong style="color:#2ecc71; font-size:1.1em;">Skip Counting</strong><br>
+      3, 6, 9, 12 &nbsp;—&nbsp; count by <strong>3s</strong>
+    </div>
+  </div>
+  <div style="margin-top:6px; font-size:0.7em; color:#6c757d;">
+    The <strong>first number</strong> tells you how many groups.<br>
+    The <strong>second number</strong> tells you how many in each group.
+  </div>
+</section>
+
+<!-- Table slides + Mixed Practice generated by JS -->
+
+<section class="slide-title" style="background:linear-gradient(135deg,#1a5276,#1a1a3e)!important;">
+  <h1>🌟 Keep Practicing!</h1>
+  <div class="divider"></div>
+  <p style="color:rgba(255,255,255,0.7)!important;">Practice every day to get faster!</p>
+</section>
+
+</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+<script>
+// ─── Table data & colors ──────────────────────────────
+const TABLE_COLORS = {
+  2: '#e74c3c', 3: '#e67e22', 4: '#f39c12', 5: '#27ae60',
+  6: '#1abc9c', 7: '#3498db', 8: '#9b59b6', 9: '#e91e63',
+  10: '#00bcd4', 11: '#ff5722', 12: '#4caf50', 13: '#3f51b5',
+  14: '#ff9800', 15: '#009688', 16: '#673ab7', 17: '#795548',
+  18: '#607d8b', 19: '#e74c3c', 20: '#2196f3',
+};
+
+const MAX_PER_TABLE = 12;
+
+// ─── Quiz state ───────────────────────────────────────
+const quizState = {};
+
+function initQuiz(table) {
+  if (!quizState[table]) {
+    quizState[table] = { correct: 0, total: 0, current: null };
+  }
+  return quizState[table];
+}
+
+function genQuestion(table) {
+  const m = Math.floor(Math.random() * MAX_PER_TABLE) + 1;
+  const answers = [table * m];
+  while (answers.length < 4) {
+    const diff = Math.floor(Math.random() * 7) + 1;
+    const dir = Math.random() < 0.5 ? 1 : -1;
+    const w = table * m + diff * dir;
+    if (w > 0 && !answers.includes(w)) answers.push(w);
+  }
+  for (let i = answers.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [answers[i], answers[j]] = [answers[j], answers[i]];
+  }
+  return { table, multiplier: m, answer: table * m, options: answers };
+}
+
+function newQuestion(table) {
+  const q = genQuestion(table);
+  quizState[table].current = q;
+  renderQuestion(table);
+}
+
+function renderQuestion(table) {
+  const state = quizState[table];
+  const q = state.current;
+  if (!q) return;
+
+  const qEl = document.getElementById(`q-${table}`);
+  const optsEl = document.getElementById(`opts-${table}`);
+  const scoreEl = document.getElementById(`score-${table}`);
+  if (!qEl || !optsEl) return;
+
+  qEl.innerHTML = `${table} × <span style="font-weight:900;font-size:1.1em;">${q.multiplier}</span> = <span style="color:#6c757d;">?</span>`;
+
+  optsEl.innerHTML = q.options.map((opt, i) =>
+    `<button class="opt-btn" data-table="${table}" data-answer="${q.answer}" data-value="${opt}" onclick="checkAnswer(this, ${table})">${opt}</button>`
+  ).join('');
+
+  if (scoreEl) {
+    const pct = state.total > 0 ? Math.round(state.correct / state.total * 100) : 0;
+    scoreEl.innerHTML = `<span>✅ <strong>${state.correct}</strong> / ${state.total}</span> <span>🎯 <strong>${pct}%</strong></span>`;
+  }
+}
+
+function checkAnswer(btn, table) {
+  const answer = parseInt(btn.dataset.answer);
+  const value = parseInt(btn.dataset.value);
+  const state = quizState[table];
+  if (!state) return;
+  if (btn.disabled) return;
+
+  state.total++;
+
+  const buttons = document.querySelectorAll(`#opts-${table} .opt-btn`);
+  if (value === answer) {
+    state.correct++;
+    btn.classList.add('correct');
+    buttons.forEach(b => b.disabled = true);
+    setTimeout(() => newQuestion(table), 600);
+  } else {
+    btn.classList.add('wrong');
+    buttons.forEach(b => {
+      if (parseInt(b.dataset.value) === answer) b.classList.add('correct');
+      b.disabled = true;
+    });
+    setTimeout(() => newQuestion(table), 900);
+  }
+
+  const scoreEl = document.getElementById(`score-${table}`);
+  if (scoreEl) {
+    const pct = Math.round(state.correct / state.total * 100);
+    scoreEl.innerHTML = `<span>✅ <strong>${state.correct}</strong> / ${state.total}</span> <span>🎯 <strong>${pct}%</strong></span>`;
+  }
+}
+
+// ─── Practice states & helpers ────────────────────────
+const practiceState = {};
+const visited = {};
+
+// ─── Generate table & practice slides ─────────────────
+(function buildSlides() {
+  const slidesContainer = document.querySelector('.slides');
+  const closingSlide = slidesContainer.children[slidesContainer.children.length - 1];
+
+  for (let t = 2; t <= 20; t++) {
+    const color = TABLE_COLORS[t];
+
+    // ── LESSON slide ──
+    const lesson = document.createElement('section');
+    lesson.className = 'table-slide';
+    lesson.innerHTML = `
+      <div class="table-header">
+        <div class="table-badge" style="background:${color};">${t}</div>
+        <h2>${t}× Table</h2>
+      </div>
+      <div class="skip-row" id="skip-${t}"></div>
+      <div class="table-grid" id="facts-${t}"></div>
+      <div class="practice-area">
+        <div class="practice-question" id="q-${t}">${t} × <span style="color:#6c757d;">?</span></div>
+        <div class="practice-options" id="opts-${t}"></div>
+        <div class="practice-score" id="score-${t}"></div>
+      </div>
+    `;
+    slidesContainer.insertBefore(lesson, closingSlide);
+    initQuiz(t);
+
+    // Fill facts
+    const factsEl = document.getElementById(`facts-${t}`);
+    if (factsEl) {
+      let html = '';
+      for (let m = 1; m <= MAX_PER_TABLE; m++) {
+        const isEven = m % 2 === 0;
+        html += `<div class="table-fact" style="border-left:3px solid ${color};${isEven ? 'background:#f7f5f0;' : ''}">
+          <span class="tf-op">${t} ×</span>
+          <span style="font-weight:600;">${m}</span>
+          <span class="tf-eq">=</span>
+          <span class="tf-ans" style="color:${color};">${t * m}</span>
+        </div>`;
+      }
+      factsEl.innerHTML = html;
+    }
+
+    // Skip count
+    const skipEl = document.getElementById(`skip-${t}`);
+    if (skipEl) {
+      let html = '';
+      for (let m = 1; m <= MAX_PER_TABLE; m++) {
+        const val = t * m;
+        html += `<div class="skip-num" style="background:${color};opacity:${0.3 + (m / MAX_PER_TABLE) * 0.7};">${val}</div>`;
+      }
+      html += `<div style="margin-left:4px;font-size:0.55em;color:#6c757d;display:flex;align-items:center;">count by ${t}s</div>`;
+      skipEl.innerHTML = html;
+    }
+
+    // ── PRACTICE slide ──
+    const practice = document.createElement('section');
+    practice.className = 'practice-slide';
+    practice.setAttribute('data-table', t);
+    practice.innerHTML = `
+      <div class="p-header">
+        <div class="table-badge" style="background:${color};width:44px;height:44px;font-size:1.3em;">${t}</div>
+        <h2 style="font-size:1.2em;">Practice: ${t}× Table</h2>
+      </div>
+      <div class="p-question" id="pq-${t}">${t} × <span style="color:#adb5bd;">?</span></div>
+      <div class="p-options" id="popts-${t}"></div>
+      <div class="p-stats">
+        <span>✅ <strong id="pc-${t}">0</strong> / <span id="pt-${t}">0</span></span>
+        <span>🔥 Streak: <strong id="ps-${t}">0</strong></span>
+        <span>🎯 <strong id="pp-${t}">0%</strong></span>
+      </div>
+      <div class="p-next" id="pn-${t}" style="display:none;">
+        <div style="font-size:0.85em;color:#28a745;font-weight:700;margin-bottom:4px;">🌟 Great practice!</div>
+        <button onclick="Reveal.next()" style="font-family:Inter,sans-serif;font-size:0.75em;font-weight:700;padding:10px 28px;border:none;border-radius:30px;background:${color};color:white;cursor:pointer;">
+          Next: ${t + 1}× Table →
+        </button>
+      </div>
+    `;
+    slidesContainer.insertBefore(practice, closingSlide);
+
+    // Init practice state
+    practiceState[t] = { correct: 0, total: 0, streak: 0, bestStreak: 0, current: null };
+  }
+
+  // ─── Add Mixed Practice slide ────────────────────────
+  const mixedSection = document.createElement('section');
+  mixedSection.style.cssText = 'background:linear-gradient(135deg,#667eea,#764ba2)!important;color:white!important;display:flex!important;flex-direction:column;justify-content:center;align-items:center;';
+  mixedSection.innerHTML = `
+    <h2 style="color:white!important;margin-bottom:6px;">🎲 Mixed Practice</h2>
+    <p style="color:rgba(255,255,255,0.8)!important;font-size:0.65em;">Questions from <strong>all</strong> tables — 2× through 20×</p>
+    <div class="practice-area" style="margin-top:6px;">
+      <div class="practice-question" id="q-mixed" style="color:white;font-size:1.3em;">?</div>
+      <div class="practice-options" id="opts-mixed" style="max-width:320px;margin:6px auto;"></div>
+      <div class="practice-score" id="score-mixed" style="color:rgba(255,255,255,0.7);"></div>
+      <div style="margin-top:4px;">
+        <button onclick="newMixedQuestion()" style="font-family:Inter,sans-serif;font-size:0.6em;font-weight:600;padding:6px 16px;border:2px solid rgba(255,255,255,0.3);border-radius:20px;background:rgba(255,255,255,0.1);color:white;cursor:pointer;">🎲 Skip</button>
+      </div>
+    </div>
+  `;
+  mixedSection.classList.add('mixed-bg');
+  slidesContainer.insertBefore(mixedSection, closingSlide);
+})();
+
+function genPracticeQuestion(table) {
+  const m = Math.floor(Math.random() * 12) + 1;
+  const answer = table * m;
+  const options = [answer];
+  while (options.length < 4) {
+    const diff = Math.floor(Math.random() * 7) + 2;
+    const dir = Math.random() < 0.5 ? 1 : -1;
+    const w = answer + diff * dir;
+    if (w > 0 && !options.includes(w)) options.push(w);
+  }
+  for (let i = options.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [options[i], options[j]] = [options[j], options[i]];
+  }
+  return { table, multiplier: m, answer, options };
+}
+
+function renderPracticeQuestion(table) {
+  const state = practiceState[table];
+  if (!state || !state.current) return;
+
+  const qEl = document.getElementById(`pq-${table}`);
+  const optsEl = document.getElementById(`popts-${table}`);
+  if (!qEl || !optsEl) return;
+
+  const q = state.current;
+  const color = TABLE_COLORS[table];
+  qEl.innerHTML = `<span style="font-size:1em;">${table}</span> × <span style="font-size:1.4em;font-weight:900;">${q.multiplier}</span> = <span style="color:#adb5bd;font-size:1em;">?</span>`;
+
+  optsEl.innerHTML = q.options.map((opt, i) =>
+    `<button class="p-opt-btn" style="border-color:${color};" data-table="${table}" data-answer="${q.answer}" data-value="${opt}" onclick="checkPractice(this, ${table})">${opt}</button>`
+  ).join('');
+}
+
+function updatePracticeScore(table) {
+  const state = practiceState[table];
+  if (!state) return;
+  const cEl = document.getElementById(`pc-${table}`);
+  const tEl = document.getElementById(`pt-${table}`);
+  const sEl = document.getElementById(`ps-${table}`);
+  const pEl = document.getElementById(`pp-${table}`);
+  const nEl = document.getElementById(`pn-${table}`);
+  if (cEl) cEl.textContent = state.correct;
+  if (tEl) tEl.textContent = state.total;
+  if (sEl) sEl.textContent = state.streak;
+  if (pEl) pEl.textContent = state.total > 0 ? Math.round(state.correct / state.total * 100) + '%' : '0%';
+
+  // Show next button when 8+ correct
+  if (nEl && state.correct >= 8) {
+    nEl.style.display = 'block';
+  }
+}
+
+function checkPractice(btn, table) {
+  const answer = parseInt(btn.dataset.answer);
+  const value = parseInt(btn.dataset.value);
+  const state = practiceState[table];
+  if (!state || !state.current) return;
+  if (btn.disabled) return;
+
+  state.total++;
+  const buttons = document.querySelectorAll(`#popts-${table} .p-opt-btn`);
+
+  if (value === answer) {
+    state.correct++;
+    state.streak++;
+    if (state.streak > state.bestStreak) state.bestStreak = state.streak;
+    btn.classList.add('correct');
+    buttons.forEach(b => b.disabled = true);
+    setTimeout(() => { state.current = genPracticeQuestion(table); renderPracticeQuestion(table); updatePracticeScore(table); }, 500);
+  } else {
+    state.streak = 0;
+    btn.classList.add('wrong');
+    buttons.forEach(b => {
+      if (parseInt(b.dataset.value) === answer) b.classList.add('correct');
+      b.disabled = true;
+    });
+    setTimeout(() => { state.current = genPracticeQuestion(table); renderPracticeQuestion(table); updatePracticeScore(table); }, 800);
+  }
+  updatePracticeScore(table);
+}
+
+function startPractice(table) {
+  if (!practiceState[table]) return;
+  if (!practiceState[table].current) {
+    practiceState[table].current = genPracticeQuestion(table);
+    renderPracticeQuestion(table);
+    updatePracticeScore(table);
+  }
+}
+
+// ─── Mixed practice ───────────────────────────────────
+const mixedState = { correct: 0, total: 0, current: null };
+
+function newMixedQuestion() {
+  const table = Math.floor(Math.random() * 19) + 2;
+  const multiplier = Math.floor(Math.random() * 12) + 1;
+  const answer = table * multiplier;
+  const options = [answer];
+  while (options.length < 4) {
+    const diff = Math.floor(Math.random() * 9) + 1;
+    const dir = Math.random() < 0.5 ? 1 : -1;
+    const w = answer + diff * dir;
+    if (w > 0 && !options.includes(w)) options.push(w);
+  }
+  for (let i = options.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [options[i], options[j]] = [options[j], options[i]];
+  }
+  mixedState.current = { table, multiplier, answer, options };
+
+  const qEl = document.getElementById('q-mixed');
+  const optsEl = document.getElementById('opts-mixed');
+  if (!qEl || !optsEl) return;
+
+  const color = TABLE_COLORS[table] || '#667eea';
+  qEl.innerHTML = `<span style="display:inline-flex;align-items:center;gap:4px;">
+    <span style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:8px;background:${color};color:white;font-size:0.65em;font-weight:800;">${table}</span>
+    × <span style="font-weight:900;font-size:1.1em;">${multiplier}</span>
+    = <span style="color:rgba(255,255,255,0.4);">?</span>
+  </span>`;
+
+  optsEl.innerHTML = options.map((opt, i) =>
+    `<button class="opt-btn" data-mixed="true" data-answer="${answer}" data-value="${opt}" onclick="checkMixed(this)">${opt}</button>`
+  ).join('');
+}
+
+function checkMixed(btn) {
+  const answer = parseInt(btn.dataset.answer);
+  const value = parseInt(btn.dataset.value);
+  const state = mixedState;
+  if (!state.current) return;
+  if (btn.disabled) return;
+
+  state.total++;
+  const buttons = document.querySelectorAll('#opts-mixed .opt-btn');
+
+  if (value === answer) {
+    state.correct++;
+    btn.classList.add('correct');
+    buttons.forEach(b => b.disabled = true);
+    setTimeout(() => newMixedQuestion(), 700);
+  } else {
+    btn.classList.add('wrong');
+    buttons.forEach(b => {
+      if (parseInt(b.dataset.value) === answer) b.classList.add('correct');
+      b.disabled = true;
+    });
+    setTimeout(() => newMixedQuestion(), 1000);
+  }
+
+  const scoreEl = document.getElementById('score-mixed');
+  if (scoreEl) {
+    const pct = Math.round(state.correct / state.total * 100);
+    scoreEl.innerHTML = `<span>✅ <strong>${state.correct}</strong> / ${state.total}</span> <span>🎯 <strong>${pct}%</strong></span>`;
+  }
+}
+
+// ─── Init quizzes on slide show ───────────────────────
+Reveal.on('slidechanged', event => {
+  const slide = event.currentSlide;
+
+  // Practice slide
+  if (slide.classList.contains('practice-slide')) {
+    const table = parseInt(slide.dataset.table);
+    if (table) startPractice(table);
+    return;
+  }
+
+  const h2 = slide.querySelector('h2');
+  if (!h2) return;
+
+  // Mixed practice slide
+  if (h2.textContent.includes('Mixed Practice')) {
+    if (!mixedState.current) newMixedQuestion();
+    return;
+  }
+
+  // Lesson table slides
+  const match = h2.textContent.match(/^(\d+)/);
+  if (!match) return;
+  const table = parseInt(match[1]);
+  if (!table || table < 2 || table > 20) return;
+  if (!visited[table]) {
+    visited[table] = true;
+    newQuestion(table);
+  }
+});
+
+// ─── Initialize Reveal ────────────────────────────────
+Reveal.initialize({
+  controls: true,
+  progress: true,
+  center: true,
+  hash: true,
+  transition: 'slide',
+  width: 960,
+  height: 700,
+});
+
+// ─── Trigger first questions on visible slides ────────
+document.addEventListener('DOMContentLoaded', () => {
+  // Start first table quiz after a brief delay
+  setTimeout(() => {
+    const visibleFacts = document.querySelectorAll('.table-fact');
+    if (visibleFacts.length === 0) return;
+    // Find which table slides have questions not yet started
+    document.querySelectorAll('.table-slide').forEach(slide => {
+      const h2 = slide.querySelector('h2');
+      if (!h2) return;
+      const m = h2.textContent.match(/^(\d+)/);
+      if (!m) return;
+      const table = parseInt(m[1]);
+      if (!visited[table]) {
+        visited[table] = true;
+        newQuestion(table);
+      }
+    });
+  }, 300);
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>➕➖ Addition & Subtraction — Learn with Carry & Borrow</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/white.css">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap');
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+.reveal {
+  font-family: 'Inter', sans-serif;
+  font-size: 20px;
+  background: #f5f2eb;
+}
+.reveal .slides { text-align: center; }
+
+/* ─── Title Slide ─── */
+.slide-title {
+  background: linear-gradient(135deg, #e65100, #bf360c) !important;
+  color: white !important;
+  display: flex !important;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 40px !important;
+}
+.slide-title h1 { color: white !important; font-size: 2.6em; font-weight: 900; letter-spacing: -0.03em; }
+.slide-title .title-divider { width: 80px; height: 4px; background: #ffb74d; margin: 0.5em auto; border-radius: 2px; }
+.slide-title p { color: rgba(255,255,255,0.75) !important; font-size: 1em; font-weight: 300; }
+
+/* ─── Section slides ─── */
+.slide-section {
+  display: flex !important;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 24px 30px !important;
+}
+.slide-section.add-section { background: linear-gradient(135deg, #fff8e1, #ffecb3) !important; }
+.slide-section.sub-section { background: linear-gradient(135deg, #e3f2fd, #bbdefb) !important; }
+.slide-section h2 { font-size: 1.6em; font-weight: 800; margin-bottom: 0.3em; }
+.slide-section .sec-icon { font-size: 2em; margin-bottom: 6px; }
+
+/* ─── Level slides ─── */
+.level-slide {
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 16px 24px !important;
+}
+.level-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+.level-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  font-size: 1.2em;
+  font-weight: 900;
+  color: white;
+  padding: 0 12px;
+  flex-shrink: 0;
+}
+.level-label {
+  font-size: 0.65em;
+  color: #6c757d;
+  font-weight: 500;
+  margin-bottom: 2px;
+}
+.level-header h2 { margin: 0; font-size: 1.2em; font-weight: 800; }
+
+/* ─── Vertical Math Display ─── */
+.v-math {
+  font-family: 'JetBrains Mono', monospace;
+  display: inline-block;
+  background: white;
+  border: 2px solid #e9ecef;
+  border-radius: 14px;
+  padding: 10px 20px 8px;
+  margin: 6px 0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  text-align: right;
+  position: relative;
+}
+.v-math .v-row { display: flex; align-items: center; justify-content: flex-end; gap: 4px; height: 28px; }
+.v-math .v-pl { width: 36px; text-align: center; font-size: 0.6em; color: #adb5bd; font-family: Inter, sans-serif; font-weight: 600; flex-shrink: 0; }
+.v-math .v-d { width: 32px; text-align: center; font-size: 1.1em; font-weight: 700; color: #212529; font-family: 'JetBrains Mono', monospace; }
+.v-math .v-op-sig { width: 36px; text-align: center; font-size: 1.1em; font-weight: 700; color: #495057; flex-shrink: 0; }
+.v-math .v-carry-row { height: 20px; margin-bottom: -4px; }
+.v-math .v-carry-row .v-d { font-size: 0.75em; color: #e74c3c; font-weight: 700; }
+.v-math .v-borrow-row .v-d { font-size: 0.75em; color: #e74c3c; font-weight: 700; }
+.v-math .v-cross { text-decoration: line-through; color: #adb5bd !important; font-size: 0.8em; }
+.v-math .v-ans-row { border-top: 2px solid #212529; padding-top: 2px; margin-top: 0; }
+.v-math .v-ans-row .v-d { color: #2e7d32; }
+.v-math .v-qmark .v-d { color: #6c757d !important; }
+.v-hint { font-family: Inter, sans-serif; font-size: 0.55em; color: #6c757d; margin-top: 2px; max-width: 400px; }
+
+/* ─── Practice Quiz ─── */
+.prac-area { margin-top: 8px; width: 100%; max-width: 520px; }
+.prac-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  max-width: 300px;
+  margin: 8px auto;
+}
+.prac-options button {
+  font-family: 'Inter', sans-serif;
+  font-size: 1.1em;
+  font-weight: 700;
+  padding: 10px 16px;
+  border: 2px solid #dee2e6;
+  border-radius: 10px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.12s;
+  color: #212529;
+}
+.prac-options button:hover { transform: scale(1.04); border-color: #adb5bd; }
+.prac-options button.correct { background: #d4edda !important; border-color: #28a745 !important; color: #155724 !important; }
+.prac-options button.wrong { background: #fce8e8 !important; border-color: #e57373 !important; color: #b71c1c !important; }
+.prac-options button:disabled { opacity: 0.7; cursor: default; transform: none; }
+.prac-score {
+  font-size: 0.75em;
+  color: #6c757d;
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  margin-top: 4px;
+}
+.prac-score strong { color: #212529; }
+.prac-next {
+  margin-top: 6px;
+  display: none;
+}
+.prac-next button {
+  font-family: Inter, sans-serif;
+  font-size: 0.75em;
+  font-weight: 700;
+  padding: 10px 28px;
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  color: white;
+  transition: all 0.12s;
+}
+.prac-next button:hover { transform: scale(1.05); }
+.prac-encourage {
+  font-size: 0.85em;
+  font-weight: 700;
+  margin-bottom: 4px;
+  min-height: 1.3em;
+}
+
+/* ─── Mixed practice ─── */
+.mixed-slide {
+  background: linear-gradient(135deg, #667eea, #764ba2) !important;
+  color: white !important;
+  display: flex !important;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.mixed-slide h2 { color: white !important; }
+.mixed-slide .v-math { background: rgba(255,255,255,0.95); }
+.mixed-slide .prac-score { color: rgba(255,255,255,0.7); }
+.mixed-slide .prac-score strong { color: white; }
+.mixed-slide .prac-options button { border-color: rgba(255,255,255,0.4); color: white; background: rgba(255,255,255,0.15); }
+.mixed-slide .prac-options button:hover { background: rgba(255,255,255,0.25); border-color: rgba(255,255,255,0.6); }
+.mixed-slide .prac-options button.correct { background: #d4edda !important; border-color: #28a745 !important; color: #155724 !important; }
+.mixed-slide .prac-options button.wrong { background: #fce8e8 !important; border-color: #e57373 !important; color: #b71c1c !important; }
+
+.reveal .slide-background { background: #f5f2eb; }
+.reveal .progress { height: 3px; }
+.reveal .progress span { background: #e65100; }
+
+.encourage-msg { min-height: 1.3em; }
+
+/* ─── Mobile Responsive ─── */
+@media (max-width: 768px) {
+  .prac-options button {
+    padding: 16px 24px !important;
+    font-size: 1.3em !important;
+    min-height: 52px;
+  }
+  .prac-next button {
+    padding: 14px 32px !important;
+    font-size: 1em !important;
+  }
+  .v-math {
+    padding: 8px 12px !important;
+  }
+  .v-math .v-d {
+    width: 28px !important;
+    font-size: 1em !important;
+  }
+  .v-math .v-op-sig {
+    width: 30px !important;
+  }
+  .v-math .v-pl {
+    width: 28px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .prac-options button {
+    padding: 20px 28px !important;
+    font-size: 1.5em !important;
+    min-height: 60px;
+  }
+  .v-math .v-d {
+    width: 24px !important;
+    font-size: 0.9em !important;
+  }
+  .level-badge {
+    min-width: 48px !important;
+    height: 48px !important;
+    font-size: 1em !important;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="reveal">
+<div class="slides">
+
+<!-- ══════════════════════════════════════════════════ -->
+<!-- SLIDE 0: TITLE                                    -->
+<!-- ══════════════════════════════════════════════════ -->
+<section class="slide-title">
+  <h1>➕➖ Addition &amp; Subtraction</h1>
+  <div class="title-divider"></div>
+  <p>Learn to add and subtract with <strong style="color:#ffb74d;">carry</strong> and <strong style="color:#ffb74d;">borrow</strong></p>
+  <p style="font-size:0.6em; opacity:0.5; margin-top:20px;">Basic 3 &amp; Basic 4 • Press → to begin</p>
+</section>
+
+<!-- ══════════════════════════════════════════════════ -->
+<!-- SLIDE 1: Intro to Addition                         -->
+<!-- ══════════════════════════════════════════════════ -->
+<section class="slide-section add-section">
+  <div class="sec-icon">➕</div>
+  <h2>What Is Addition?</h2>
+  <div style="display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin:8px 0; max-width:700px;">
+    <div class="tip-card" style="background:white; border:2px solid #ffe0b2; border-radius:12px; padding:12px 16px; max-width:220px; text-align:left; font-size:0.72em; line-height:1.6;">
+      <strong style="color:#e65100; font-size:1.1em;">Putting Together</strong><br>
+      3 + 4 means <strong>3 and 4 make 7</strong>
+    </div>
+    <div class="tip-card" style="background:white; border:2px solid #ffe0b2; border-radius:12px; padding:12px 16px; max-width:220px; text-align:left; font-size:0.72em; line-height:1.6;">
+      <strong style="color:#e65100; font-size:1.1em;">Counting Up</strong><br>
+      5 + 3 = start at 5, count 3 more → <strong>8</strong>
+    </div>
+    <div class="tip-card" style="background:white; border:2px solid #ffe0b2; border-radius:12px; padding:12px 16px; max-width:220px; text-align:left; font-size:0.72em; line-height:1.6;">
+      <strong style="color:#e65100; font-size:1.1em;">Column Method</strong><br>
+      Line up H T U, add each column, <strong>carry</strong> if &ge; 10
+    </div>
+  </div>
+  <div style="margin-top:4px; font-size:0.65em; color:#6c757d; max-width:500px;">
+    We use the <strong>column method</strong> — always start from the <strong>Units</strong> column!
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════ -->
+<!-- SLIDES 2-4: ADDITION LEVELS                       -->
+<!-- ══════════════════════════════════════════════════ -->
+<section class="level-slide" data-level="add2nc">
+  <div class="level-header">
+    <div class="level-badge" style="background:#f57c00;">L1</div>
+    <div>
+      <div class="level-label">LEVEL 1 — BASIC 3</div>
+      <h2>2-Digit Addition (No Carry)</h2>
+    </div>
+  </div>
+  <div class="v-math" id="v-add2nc"></div>
+  <div class="prac-area">
+    <div class="prac-encourage" id="enc-add2nc"></div>
+    <div class="prac-options" id="opts-add2nc"></div>
+    <div class="prac-score" id="score-add2nc"><span>✅ <strong>0</strong> / 0</span> <span>🎯 <strong>0%</strong></span></div>
+    <div class="prac-next" id="next-add2nc">
+      <button onclick="Reveal.next()" style="background:#f57c00;">Next Level →</button>
+    </div>
+  </div>
+</section>
+
+<section class="level-slide" data-level="add2c">
+  <div class="level-header">
+    <div class="level-badge" style="background:#e65100;">L2</div>
+    <div>
+      <div class="level-label">LEVEL 2 — BASIC 3</div>
+      <h2>2-Digit Addition (With Carry)</h2>
+    </div>
+  </div>
+  <div class="v-math" id="v-add2c"></div>
+  <div class="prac-area">
+    <div class="prac-encourage" id="enc-add2c"></div>
+    <div class="prac-options" id="opts-add2c"></div>
+    <div class="prac-score" id="score-add2c"><span>✅ <strong>0</strong> / 0</span> <span>🎯 <strong>0%</strong></span></div>
+    <div class="prac-next" id="next-add2c">
+      <button onclick="Reveal.next()" style="background:#e65100;">Next Level →</button>
+    </div>
+  </div>
+</section>
+
+<section class="level-slide" data-level="add3c">
+  <div class="level-header">
+    <div class="level-badge" style="background:#bf360c;">L3</div>
+    <div>
+      <div class="level-label">LEVEL 3 — BASIC 3</div>
+      <h2>3-Digit Addition (With Carry)</h2>
+    </div>
+  </div>
+  <div class="v-math" id="v-add3c"></div>
+  <div class="prac-area">
+    <div class="prac-encourage" id="enc-add3c"></div>
+    <div class="prac-options" id="opts-add3c"></div>
+    <div class="prac-score" id="score-add3c"><span>✅ <strong>0</strong> / 0</span> <span>🎯 <strong>0%</strong></span></div>
+    <div class="prac-next" id="next-add3c">
+      <button onclick="Reveal.next()" style="background:#bf360c;">Next Level →</button>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════ -->
+<!-- SLIDE 5: Intro to Subtraction                      -->
+<!-- ══════════════════════════════════════════════════ -->
+<section class="slide-section sub-section">
+  <div class="sec-icon">➖</div>
+  <h2>What Is Subtraction?</h2>
+  <div style="display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin:8px 0; max-width:700px;">
+    <div class="tip-card" style="background:white; border:2px solid #bbdefb; border-radius:12px; padding:12px 16px; max-width:220px; text-align:left; font-size:0.72em; line-height:1.6;">
+      <strong style="color:#1565c0; font-size:1.1em;">Taking Away</strong><br>
+      7 − 3 means <strong>take 3 from 7</strong>, leaves 4
+    </div>
+    <div class="tip-card" style="background:white; border:2px solid #bbdefb; border-radius:12px; padding:12px 16px; max-width:220px; text-align:left; font-size:0.72em; line-height:1.6;">
+      <strong style="color:#1565c0; font-size:1.1em;">Counting Back</strong><br>
+      9 − 4 = start at 9, count back 4 → <strong>5</strong>
+    </div>
+    <div class="tip-card" style="background:white; border:2px solid #bbdefb; border-radius:12px; padding:12px 16px; max-width:220px; text-align:left; font-size:0.72em; line-height:1.6;">
+      <strong style="color:#1565c0; font-size:1.1em;">Borrowing</strong><br>
+      If top digit is smaller, <strong>borrow 1</strong> from the next column
+    </div>
+  </div>
+  <div style="margin-top:4px; font-size:0.65em; color:#6c757d; max-width:500px;">
+    We call it <strong>"borrow and pay back"</strong> — always start from <strong>Units</strong>!
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════ -->
+<!-- SLIDES 6-8: SUBTRACTION LEVELS                    -->
+<!-- ══════════════════════════════════════════════════ -->
+<section class="level-slide" data-level="sub2nb">
+  <div class="level-header">
+    <div class="level-badge" style="background:#1976d2;">L4</div>
+    <div>
+      <div class="level-label">LEVEL 4 — BASIC 3</div>
+      <h2>2-Digit Subtraction (No Borrow)</h2>
+    </div>
+  </div>
+  <div class="v-math" id="v-sub2nb"></div>
+  <div class="prac-area">
+    <div class="prac-encourage" id="enc-sub2nb"></div>
+    <div class="prac-options" id="opts-sub2nb"></div>
+    <div class="prac-score" id="score-sub2nb"><span>✅ <strong>0</strong> / 0</span> <span>🎯 <strong>0%</strong></span></div>
+    <div class="prac-next" id="next-sub2nb">
+      <button onclick="Reveal.next()" style="background:#1976d2;">Next Level →</button>
+    </div>
+  </div>
+</section>
+
+<section class="level-slide" data-level="sub2b">
+  <div class="level-header">
+    <div class="level-badge" style="background:#0d47a1;">L5</div>
+    <div>
+      <div class="level-label">LEVEL 5 — BASIC 3</div>
+      <h2>2-Digit Subtraction (With Borrow)</h2>
+    </div>
+  </div>
+  <div class="v-math" id="v-sub2b"></div>
+  <div class="prac-area">
+    <div class="prac-encourage" id="enc-sub2b"></div>
+    <div class="prac-options" id="opts-sub2b"></div>
+    <div class="prac-score" id="score-sub2b"><span>✅ <strong>0</strong> / 0</span> <span>🎯 <strong>0%</strong></span></div>
+    <div class="prac-next" id="next-sub2b">
+      <button onclick="Reveal.next()" style="background:#0d47a1;">Next Level →</button>
+    </div>
+  </div>
+</section>
+
+<section class="level-slide" data-level="sub3b">
+  <div class="level-header">
+    <div class="level-badge" style="background:#002171;">L6</div>
+    <div>
+      <div class="level-label">LEVEL 6 — BASIC 3</div>
+      <h2>3-Digit Subtraction (With Borrow)</h2>
+    </div>
+  </div>
+  <div class="v-math" id="v-sub3b"></div>
+  <div class="prac-area">
+    <div class="prac-encourage" id="enc-sub3b"></div>
+    <div class="prac-options" id="opts-sub3b"></div>
+    <div class="prac-score" id="score-sub3b"><span>✅ <strong>0</strong> / 0</span> <span>🎯 <strong>0%</strong></span></div>
+    <div class="prac-next" id="next-sub3b">
+      <button onclick="Reveal.next()" style="background:#002171;">Next Level →</button>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════ -->
+<!-- SLIDE 9: BASIC 4 SECTION                          -->
+<!-- ══════════════════════════════════════════════════ -->
+<section class="slide-section" style="background:linear-gradient(135deg,#e8f5e9,#c8e6c9)!important;">
+  <div class="sec-icon">📚</div>
+  <h2>Basic 4 — Thousands!</h2>
+  <p style="font-size:0.7em; color:#2e7d32; max-width:500px;">
+    Now we add <strong>Thousands (Th)</strong> to our place value columns.<br>
+    <strong style="font-size:1.2em;">Th &nbsp; H &nbsp; T &nbsp; U</strong><br>
+    The same rules apply — carry and borrow!
+  </p>
+</section>
+
+<!-- ══════════════════════════════════════════════════ -->
+<!-- SLIDES 10-11: BASIC 4 ADD/SUB                     -->
+<!-- ══════════════════════════════════════════════════ -->
+<section class="level-slide" data-level="add4c">
+  <div class="level-header">
+    <div class="level-badge" style="background:#2e7d32;">L7</div>
+    <div>
+      <div class="level-label">LEVEL 7 — BASIC 4</div>
+      <h2>4-Digit Addition (Th H T U)</h2>
+    </div>
+  </div>
+  <div class="v-math" id="v-add4c"></div>
+  <div class="prac-area">
+    <div class="prac-encourage" id="enc-add4c"></div>
+    <div class="prac-options" id="opts-add4c"></div>
+    <div class="prac-score" id="score-add4c"><span>✅ <strong>0</strong> / 0</span> <span>🎯 <strong>0%</strong></span></div>
+    <div class="prac-next" id="next-add4c">
+      <button onclick="Reveal.next()" style="background:#2e7d32;">Next Level →</button>
+    </div>
+  </div>
+</section>
+
+<section class="level-slide" data-level="sub4b">
+  <div class="level-header">
+    <div class="level-badge" style="background:#1b5e20;">L8</div>
+    <div>
+      <div class="level-label">LEVEL 8 — BASIC 4</div>
+      <h2>4-Digit Subtraction (Th H T U)</h2>
+    </div>
+  </div>
+  <div class="v-math" id="v-sub4b"></div>
+  <div class="prac-area">
+    <div class="prac-encourage" id="enc-sub4b"></div>
+    <div class="prac-options" id="opts-sub4b"></div>
+    <div class="prac-score" id="score-sub4b"><span>✅ <strong>0</strong> / 0</span> <span>🎯 <strong>0%</strong></span></div>
+    <div class="prac-next" id="next-sub4b">
+      <button onclick="Reveal.next()" style="background:#1b5e20;">Next Level →</button>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════ -->
+<!-- SLIDE 12: MIXED PRACTICE                          -->
+<!-- ══════════════════════════════════════════════════ -->
+<section class="level-slide mixed-slide" data-level="mixed">
+  <h2 style="margin-bottom:6px; color:white!important;">🎲 Mixed Practice</h2>
+  <p style="color:rgba(255,255,255,0.8)!important; font-size:0.65em;">Questions from all levels — add and subtract!</p>
+  <div class="v-math" id="v-mixed" style="margin-top:6px;"></div>
+  <div class="prac-area">
+    <div class="prac-encourage" id="enc-mixed" style="color:rgba(255,255,255,0.9);"></div>
+    <div class="prac-options" id="opts-mixed" style="max-width:300px;"></div>
+    <div class="prac-score" id="score-mixed" style="color:rgba(255,255,255,0.7);"><span>✅ <strong style="color:white;">0</strong> / 0</span> <span>🎯 <strong style="color:white;">0%</strong></span></div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════ -->
+<!-- SLIDE 13: CLOSING                                 -->
+<!-- ══════════════════════════════════════════════════ -->
+<section class="slide-title" style="background:linear-gradient(135deg,#bf360c,#e65100)!important;">
+  <h1>🌟 Well Done!</h1>
+  <div class="title-divider"></div>
+  <p>You're learning addition and subtraction like a champion!</p>
+  <p style="font-size:0.6em; opacity:0.6; margin-top:20px;">Keep practicing every day — you're doing great!</p>
+</section>
+
+</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+<script>
+// ─── Configuration ─────────────────────────────────────
+const LEVEL_CONFIG = {
+  add2nc: { label: '2-Digit Add (No Carry)', color: '#f57c00', op: '+', digits: 2, gen: genAdd2NC },
+  add2c:  { label: '2-Digit Add (Carry)',    color: '#e65100', op: '+', digits: 2, gen: genAdd2C },
+  add3c:  { label: '3-Digit Add (Carry)',    color: '#bf360c', op: '+', digits: 3, gen: genAdd3C },
+  sub2nb: { label: '2-Digit Sub (No Borrow)',color: '#1976d2', op: '−', digits: 2, gen: genSub2NB },
+  sub2b:  { label: '2-Digit Sub (Borrow)',   color: '#0d47a1', op: '−', digits: 2, gen: genSub2B },
+  sub3b:  { label: '3-Digit Sub (Borrow)',   color: '#002171', op: '−', digits: 3, gen: genSub3B },
+  add4c:  { label: '4-Digit Add (Carry)',    color: '#2e7d32', op: '+', digits: 4, gen: genAdd4C },
+  sub4b:  { label: '4-Digit Sub (Borrow)',   color: '#1b5e20', op: '−', digits: 4, gen: genSub4B },
+};
+
+const ENCOURAGE = [
+  'Great job! 🎉', 'Excellent! 🌟', 'You are so smart! 💪',
+  'Fantastic! ✨', 'Brilliant! 👏', 'You got it! 🏆',
+  'Wow, amazing! 🚀', 'Super work! 💫', 'Keep going! 🔥',
+  'Almost there!', 'Try again, you can do it! 💪',
+  'Don\'t give up! 🌈', 'Keep trying! ⭐',
+  'Oops! Let\'s try the next one! 😊',
+];
+
+let scores = {};
+let currentProblems = {};
+
+function initLevel(id) {
+  if (!scores[id]) scores[id] = { correct: 0, total: 0 };
+}
+
+// ─── Number generation ─────────────────────────────────
+function rand(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+
+function twoDigit() { return rand(1,9)*10 + rand(0,9); }
+function threeDigit() { return rand(1,9)*100 + rand(0,9)*10 + rand(0,9); }
+function fourDigit() { return rand(1,9)*1000 + rand(0,9)*100 + rand(0,9)*10 + rand(0,9); }
+
+// Addition: no carry (2-digit)
+function genAdd2NC() {
+  let a, b;
+  do {
+    a = twoDigit(); b = twoDigit();
+  } while ((a % 10) + (b % 10) >= 10 || Math.floor(a/10) + Math.floor(b/10) >= 10);
+  return { a, b, answer: a + b };
+}
+
+// Addition: with carry (2-digit)
+function genAdd2C() {
+  let a, b;
+  do {
+    a = twoDigit(); b = twoDigit();
+  } while ((a % 10) + (b % 10) < 10); // force units carry
+  return { a, b, answer: a + b };
+}
+
+// Addition: with carry (3-digit)
+function genAdd3C() {
+  let a, b;
+  do {
+    a = threeDigit(); b = threeDigit();
+  } while (a + b === a + 0); // just ensure sum > a
+  return { a, b, answer: a + b };
+}
+
+// Subtraction: no borrow (2-digit)
+function genSub2NB() {
+  let a, b;
+  do {
+    a = twoDigit(); b = twoDigit();
+  } while (a <= b || (a % 10) < (b % 10) || Math.floor(a/10) < Math.floor(b/10));
+  return { a, b, answer: a - b };
+}
+
+// Subtraction: with borrow (2-digit)
+function genSub2B() {
+  let a, b;
+  do {
+    a = twoDigit(); b = twoDigit();
+  } while (a <= b || (a % 10) >= (b % 10)); // force units borrow
+  return { a, b, answer: a - b };
+}
+
+// Subtraction: with borrow (3-digit)
+function genSub3B() {
+  let a, b;
+  do {
+    a = threeDigit(); b = threeDigit();
+  } while (a <= b);
+  // ensure at least one borrow
+  const au = a % 10, bu = b % 10;
+  const at = Math.floor(a/10) % 10, bt = Math.floor(b/10) % 10;
+  if (au >= bu && at >= bt) return genSub3B();
+  return { a, b, answer: a - b };
+}
+
+// Addition: 4-digit with carry
+function genAdd4C() {
+  const a = fourDigit(); const b = fourDigit();
+  return { a, b, answer: a + b };
+}
+
+// Subtraction: 4-digit with borrow
+function genSub4B() {
+  let a, b;
+  do {
+    a = fourDigit(); b = fourDigit();
+  } while (a <= b);
+  const au = a % 10, bu = b % 10;
+  if (au >= bu) return genSub4B();
+  return { a, b, answer: a - b };
+}
+
+// ─── Options generation ─────────────────────────────────
+function genOptions(correct) {
+  const opts = [correct];
+  const range = Math.max(6, Math.floor(correct * 0.3) + 1);
+  let guard = 0;
+  while (opts.length < 4 && guard < 50) {
+    guard++;
+    const d = rand(1, range);
+    const dir = Math.random() < 0.5 ? 1 : -1;
+    const w = correct + d * dir;
+    if (w > 0 && !opts.includes(w)) opts.push(w);
+  }
+  let fb = 1;
+  while (opts.length < 4) {
+    const w = correct + fb;
+    if (w > 0 && !opts.includes(w)) opts.push(w);
+    fb++;
+  }
+  for (let i = opts.length - 1; i > 0; i--) {
+    const j = rand(0, i);
+    [opts[i], opts[j]] = [opts[j], opts[i]];
+  }
+  return opts;
+}
+
+// ─── Vertical display ───────────────────────────────────
+function renderVertical(containerId, a, b, op, answer, showAnswer, levelId) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+
+  const aStr = String(a), bStr = String(b), ansStr = String(answer);
+  const maxLen = Math.max(aStr.length, bStr.length + 1, ansStr.length);
+  const pad = Math.max(2, maxLen);
+  const places = pad <= 2 ? ['T', 'U'] : pad <= 3 ? ['H', 'T', 'U'] : ['Th', 'H', 'T', 'U'];
+
+  function padded(s) { return s.padStart(pad, '0').split('').map(Number); }
+  const aD = padded(aStr);
+  const bD = padded(bStr);
+
+  const carry = new Array(pad).fill(0);
+  const borrow = new Array(pad).fill(false);
+
+  if (op === '+') {
+    let c = 0;
+    for (let i = pad - 1; i >= 0; i--) {
+      const sum = aD[i] + bD[i] + c;
+      c = sum >= 10 ? 1 : 0;
+      if (i > 0) carry[i - 1] = c;
+    }
+  } else {
+    let brw = 0;
+    for (let i = pad - 1; i >= 0; i--) {
+      let top = aD[i] - brw;
+      if (top < bD[i]) {
+        borrow[i] = true;
+        top += 10;
+        brw = 1;
+      } else {
+        borrow[i] = false;
+        brw = 0;
+      }
+    }
+  }
+
+  let html = '<div class="v-row v-pl-row">';
+  html += places.map(p => `<span class="v-pl">${p}</span>`).join('');
+  html += '</div>';
+
+  if (op === '+' && carry.some(c => c === 1)) {
+    html += '<div class="v-row v-carry-row">';
+    for (let i = 0; i < pad; i++) {
+      html += `<span class="v-d">${carry[i] ? '&#185;' : ''}</span>`;
+    }
+    html += '</div>';
+  }
+
+  if (op === '−' && borrow.some(b => b)) {
+    html += '<div class="v-row v-carry-row" style="height:18px;">';
+    for (let i = 0; i < pad; i++) {
+      html += `<span class="v-d">${borrow[i] ? `<span style="text-decoration:line-through;color:#adb5bd;">${aD[i]}</span>` : ''}</span>`;
+    }
+    html += '</div>';
+    html += '<div class="v-row v-carry-row">';
+    for (let i = 0; i < pad; i++) {
+      html += `<span class="v-d">${borrow[i] ? `<span style="color:#e74c3c;font-weight:900;">${aD[i] + 10}</span>` : ''}</span>`;
+    }
+    html += '</div>';
+  }
+
+  html += '<div class="v-row">';
+  html += '<span class="v-d"></span>'.repeat(pad - aStr.length);
+  html += aStr.split('').map(ch => `<span class="v-d">${ch}</span>`).join('');
+  html += '</div>';
+
+  html += '<div class="v-row">';
+  html += `<span class="v-op-sig">${op}</span>`;
+  html += '<span class="v-d"></span>'.repeat(pad - bStr.length);
+  html += bStr.split('').map(ch => `<span class="v-d">${ch}</span>`).join('');
+  html += '</div>';
+
+  html += '<div class="v-row v-ans-row">';
+  if (showAnswer) {
+    html += '<span class="v-d"></span>'.repeat(pad - ansStr.length);
+    html += ansStr.split('').map(ch => `<span class="v-d" style="color:#2e7d32;font-weight:900;">${ch}</span>`).join('');
+  } else {
+    html += '<span class="v-d"></span>'.repeat(Math.max(0, pad - 1));
+    html += '<span class="v-d" style="color:#6c757d;">?</span>';
+  }
+  html += '</div>';
+
+  el.innerHTML = html;
+}
+
+// ─── Question generation ────────────────────────────────
+function newQuestion(levelId) {
+  initLevel(levelId);
+  const cfg = LEVEL_CONFIG[levelId];
+  if (!cfg) return;
+
+  let prob;
+  if (levelId === 'mixed') {
+    const levels = Object.keys(LEVEL_CONFIG);
+    const l = levels[rand(0, levels.length - 1)];
+    prob = LEVEL_CONFIG[l].gen();
+  } else {
+    prob = cfg.gen();
+  }
+  if (!prob) return;
+
+  currentProblems[levelId] = prob;
+  const opts = genOptions(prob.answer);
+
+  renderVertical(`v-${levelId}`, prob.a, prob.b, cfg.op || (levelId.startsWith('add') ? '+' : '−'), prob.answer, false, levelId);
+
+  const optsEl = document.getElementById(`opts-${levelId}`);
+  if (optsEl) {
+    optsEl.innerHTML = opts.map((opt, i) =>
+      `<button class="prac-btn" data-answer="${prob.answer}" data-value="${opt}" onclick="checkAnswer(this, '${levelId}')">${opt}</button>`
+    ).join('');
+  }
+  updateScore(levelId);
+}
+
+function checkAnswer(btn, levelId) {
+  const answer = parseInt(btn.dataset.answer);
+  const value = parseInt(btn.dataset.value);
+  const state = scores[levelId];
+  if (!state) return;
+  if (btn.disabled) return;
+
+  state.total++;
+  const buttons = document.querySelectorAll(`#opts-${levelId} .prac-btn`);
+  const encEl = document.getElementById(`enc-${levelId}`);
+
+  if (value === answer) {
+    state.correct++;
+    btn.classList.add('correct');
+    buttons.forEach(b => b.disabled = true);
+    encEl.textContent = ENCOURAGE[rand(0, 6)];
+    // Show the answer in the vertical display
+    const prob = currentProblems[levelId];
+    if (prob) {
+      const cfg = LEVEL_CONFIG[levelId];
+      renderVertical(`v-${levelId}`, prob.a, prob.b, cfg.op || (levelId.startsWith('add') ? '+' : '−'), prob.answer, true, levelId);
+    }
+    setTimeout(() => newQuestion(levelId), 500);
+  } else {
+    btn.classList.add('wrong');
+    buttons.forEach(b => {
+      if (parseInt(b.dataset.value) === answer) b.classList.add('correct');
+      b.disabled = true;
+    });
+    encEl.textContent = ENCOURAGE[rand(7, 12)];
+    setTimeout(() => newQuestion(levelId), 900);
+  }
+  updateScore(levelId);
+}
+
+function updateScore(levelId) {
+  const state = scores[levelId];
+  if (!state) return;
+  const scoreEl = document.getElementById(`score-${levelId}`);
+  if (scoreEl) {
+    const pct = state.total > 0 ? Math.round(state.correct / state.total * 100) : 0;
+    scoreEl.innerHTML = `<span>✅ <strong>${state.correct}</strong> / ${state.total}</span> <span>🎯 <strong>${pct}%</strong></span>`;
+  }
+
+  // Show "next" button if 5+ correct
+  const nextEl = document.getElementById(`next-${levelId}`);
+  if (nextEl && state.correct >= 5) {
+    nextEl.style.display = 'block';
+  }
+}
+
+// ─── Slide change handler ───────────────────────────────
+Reveal.initialize({
+  controls: true,
+  progress: true,
+  center: true,
+  hash: true,
+  transition: 'slide',
+  width: 960,
+  height: 700,
+});
+
+Reveal.on('slidechanged', event => {
+  const slide = event.currentSlide;
+  if (slide.classList.contains('level-slide')) {
+    const levelId = slide.dataset.level;
+    if (levelId && levelId !== 'mixed') {
+      if (!scores[levelId] || scores[levelId].total === 0) {
+        newQuestion(levelId);
+      }
+    }
+    if (levelId === 'mixed') {
+      if (!currentProblems['mixed']) newQuestion('mixed');
+    }
+  }
+});
+
+// ─── Init first questions ───────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(() => {
+    document.querySelectorAll('.level-slide').forEach(slide => {
+      const levelId = slide.dataset.level;
+      if (levelId && levelId !== 'mixed') {
+        initLevel(levelId);
+      }
+    });
+    // Start first level
+    const first = document.querySelector('.level-slide');
+    if (first) {
+      const id = first.dataset.level;
+      if (id && id !== 'mixed') newQuestion(id);
+    }
+  }, 300);
+});
+</script>
+</body>
+</html>
