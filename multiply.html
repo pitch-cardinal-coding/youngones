@@ -523,6 +523,14 @@ const LEVEL_CONFIG = {
 
 let scores = {};
 let currentProblems = {};
+const pendingTimeouts = {};
+
+function clearPendingTimeout(id) {
+  if (pendingTimeouts[id]) {
+    clearTimeout(pendingTimeouts[id]);
+    delete pendingTimeouts[id];
+  }
+}
 
 function rand(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
 
@@ -638,6 +646,7 @@ function renderMulti(containerId, a, b, answer, showAnswer) {
 
 // ─── Question generation ────────────────────────────────
 function newQuestion(levelId) {
+  clearPendingTimeout(levelId);
   initLevel(levelId);
 
   let prob;
@@ -735,7 +744,8 @@ function checkAnswer(btn, levelId) {
         renderMulti(vId, prob.a, prob.b, prob.answer, true);
       }
     }
-    setTimeout(() => newQuestion(levelId), 500);
+    clearPendingTimeout(levelId);
+    pendingTimeouts[levelId] = setTimeout(() => newQuestion(levelId), 500);
   } else {
     btn.classList.add('wrong');
     buttons.forEach(b => {
@@ -743,7 +753,8 @@ function checkAnswer(btn, levelId) {
       b.disabled = true;
     });
     encEl.textContent = ENCOURAGE[rand(9, 12)];
-    setTimeout(() => newQuestion(levelId), 900);
+    clearPendingTimeout(levelId);
+    pendingTimeouts[levelId] = setTimeout(() => newQuestion(levelId), 900);
   }
   updateScore(levelId);
   requestAnimationFrame(() => Reveal.layout());
@@ -777,6 +788,10 @@ Reveal.initialize({
 
 Reveal.on('slidechanged', event => {
   const slide = event.currentSlide;
+  const prevLevel = event.previousSlide ? event.previousSlide.dataset.level : null;
+  if (prevLevel && prevLevel !== 'mixed') {
+    clearPendingTimeout(prevLevel);
+  }
   if (slide.classList.contains('level-slide')) {
     const levelId = slide.dataset.level;
     if (levelId && levelId !== 'mixed') {

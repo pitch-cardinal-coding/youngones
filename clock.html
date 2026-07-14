@@ -731,7 +731,13 @@ function drawClock(id) {
     const isWordy = id === 'clock-6' || id === 'clock-7' || id === 'clock-8' || id === 'clock-9';
     label.textContent = isWordy ? formatTimeWords(st.hours, st.minutes) : formatTime(st.hours, st.minutes);
   }
-  requestAnimationFrame(() => Reveal.layout());
+}
+
+// ─── Debounced layout relayout ──────────────────────
+let rAFLayout = null;
+function scheduleLayout() {
+  if (rAFLayout) cancelAnimationFrame(rAFLayout);
+  rAFLayout = requestAnimationFrame(() => { Reveal.layout(); rAFLayout = null; });
 }
 
 // ─── Time formatting ──────────────────────────────────
@@ -924,17 +930,29 @@ Reveal.on('slidechanged', event => {
   // Redraw all visible clocks (handles canvas repaint after reveal transitions)
   const canvases = document.querySelectorAll('canvas');
   canvases.forEach(c => drawClock(c.id));
-  requestAnimationFrame(() => Reveal.layout());
+  scheduleLayout();
 });
 
 // ─── Initial draw ─────────────────────────────────────
 document.querySelectorAll('canvas').forEach(c => drawClock(c.id));
-requestAnimationFrame(() => Reveal.layout());
+scheduleLayout();
 
-// ─── Rerender on resize ───────────────────────────────
-window.addEventListener('resize', () => {
-  document.querySelectorAll('canvas').forEach(c => drawClock(c.id));
-  requestAnimationFrame(() => Reveal.layout());
+// ─── Rerender on resize (tracked for cleanup) ─────────
+let rAFResize = null;
+function onResize() {
+  if (rAFResize) cancelAnimationFrame(rAFResize);
+  rAFResize = requestAnimationFrame(() => {
+    document.querySelectorAll('canvas').forEach(c => drawClock(c.id));
+    scheduleLayout();
+    rAFResize = null;
+  });
+}
+window.addEventListener('resize', onResize);
+
+// ─── Cleanup on page unload ──────────────────────────
+window.addEventListener('beforeunload', () => {
+  if (rAFResize) cancelAnimationFrame(rAFResize);
+  window.removeEventListener('resize', onResize);
 });
 </script>
 <button class="home-btn" title="Home" onclick="location.replace('index.html')">⌂</button>

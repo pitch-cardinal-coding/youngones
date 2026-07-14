@@ -345,6 +345,14 @@ const MAX_PER_TABLE = 12;
 
 // ─── Quiz state ───────────────────────────────────────
 const quizState = {};
+const pendingTimeouts = {};
+
+function clearPendingTimeout(id) {
+  if (pendingTimeouts[id]) {
+    clearTimeout(pendingTimeouts[id]);
+    delete pendingTimeouts[id];
+  }
+}
 
 function initQuiz(table) {
   if (!quizState[table]) {
@@ -412,14 +420,16 @@ function checkAnswer(btn, table) {
     state.correct++;
     btn.classList.add('correct');
     buttons.forEach(b => b.disabled = true);
-    setTimeout(() => newQuestion(table), 600);
+    clearPendingTimeout(`lesson-${table}`);
+    pendingTimeouts[`lesson-${table}`] = setTimeout(() => newQuestion(table), 600);
   } else {
     btn.classList.add('wrong');
     buttons.forEach(b => {
       if (parseInt(b.dataset.value) === answer) b.classList.add('correct');
       b.disabled = true;
     });
-    setTimeout(() => newQuestion(table), 900);
+    clearPendingTimeout(`lesson-${table}`);
+    pendingTimeouts[`lesson-${table}`] = setTimeout(() => newQuestion(table), 900);
   }
 
   const scoreEl = document.getElementById(`score-${table}`);
@@ -607,7 +617,8 @@ function checkPractice(btn, table) {
     if (state.streak > state.bestStreak) state.bestStreak = state.streak;
     btn.classList.add('correct');
     buttons.forEach(b => b.disabled = true);
-    setTimeout(() => { state.current = genPracticeQuestion(table); renderPracticeQuestion(table); updatePracticeScore(table); }, 500);
+    clearPendingTimeout(`practice-${table}`);
+    pendingTimeouts[`practice-${table}`] = setTimeout(() => { state.current = genPracticeQuestion(table); renderPracticeQuestion(table); updatePracticeScore(table); }, 500);
   } else {
     state.streak = 0;
     btn.classList.add('wrong');
@@ -615,7 +626,8 @@ function checkPractice(btn, table) {
       if (parseInt(b.dataset.value) === answer) b.classList.add('correct');
       b.disabled = true;
     });
-    setTimeout(() => { state.current = genPracticeQuestion(table); renderPracticeQuestion(table); updatePracticeScore(table); }, 800);
+    clearPendingTimeout(`practice-${table}`);
+    pendingTimeouts[`practice-${table}`] = setTimeout(() => { state.current = genPracticeQuestion(table); renderPracticeQuestion(table); updatePracticeScore(table); }, 800);
   }
   updatePracticeScore(table);
 }
@@ -680,14 +692,16 @@ function checkMixed(btn) {
     state.correct++;
     btn.classList.add('correct');
     buttons.forEach(b => b.disabled = true);
-    setTimeout(() => newMixedQuestion(), 700);
+    clearPendingTimeout('mixed');
+    pendingTimeouts['mixed'] = setTimeout(() => newMixedQuestion(), 700);
   } else {
     btn.classList.add('wrong');
     buttons.forEach(b => {
       if (parseInt(b.dataset.value) === answer) b.classList.add('correct');
       b.disabled = true;
     });
-    setTimeout(() => newMixedQuestion(), 1000);
+    clearPendingTimeout('mixed');
+    pendingTimeouts['mixed'] = setTimeout(() => newMixedQuestion(), 1000);
   }
 
   const scoreEl = document.getElementById('score-mixed');
@@ -700,6 +714,24 @@ function checkMixed(btn) {
 // ─── Init quizzes on slide show ───────────────────────
 Reveal.on('slidechanged', event => {
   const slide = event.currentSlide;
+  const prevSlide = event.previousSlide;
+
+  if (prevSlide) {
+    if (prevSlide.classList.contains('practice-slide')) {
+      const prevTable = parseInt(prevSlide.dataset.table);
+      if (prevTable) clearPendingTimeout(`practice-${prevTable}`);
+    }
+    if (prevSlide.classList.contains('table-slide')) {
+      const h2 = prevSlide.querySelector('h2');
+      if (h2) {
+        const m = h2.textContent.match(/^(\d+)/);
+        if (m) clearPendingTimeout(`lesson-${parseInt(m[1])}`);
+      }
+    }
+    if (prevSlide.querySelector('#q-mixed')) {
+      clearPendingTimeout('mixed');
+    }
+  }
 
   requestAnimationFrame(() => Reveal.layout());
 
@@ -715,7 +747,10 @@ Reveal.on('slidechanged', event => {
 
   // Mixed practice slide
   if (h2.textContent.includes('Mixed Practice')) {
-    if (!mixedState.current) newMixedQuestion();
+    if (!mixedState.current) {
+      clearPendingTimeout('mixed');
+      newMixedQuestion();
+    }
     return;
   }
 

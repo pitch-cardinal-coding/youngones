@@ -537,6 +537,14 @@ const ENCOURAGE = [
 
 let scores = {};
 let currentProblems = {};
+const pendingTimeouts = {};
+
+function clearPendingTimeout(id) {
+  if (pendingTimeouts[id]) {
+    clearTimeout(pendingTimeouts[id]);
+    delete pendingTimeouts[id];
+  }
+}
 
 function initLevel(id) {
   if (!scores[id]) scores[id] = { correct: 0, total: 0 };
@@ -751,6 +759,7 @@ function renderVertical(containerId, a, b, op, answer, showAnswer, levelId) {
 
 // ─── Question generation ────────────────────────────────
 function newQuestion(levelId) {
+  clearPendingTimeout(levelId);
   initLevel(levelId);
 
   let prob;
@@ -803,7 +812,8 @@ function checkAnswer(btn, levelId) {
     if (prob) {
       renderVertical(`v-${levelId}`, prob.a, prob.b, prob.op, prob.answer, true, levelId);
     }
-    setTimeout(() => newQuestion(levelId), 500);
+    clearPendingTimeout(levelId);
+    pendingTimeouts[levelId] = setTimeout(() => newQuestion(levelId), 500);
   } else {
     btn.classList.add('wrong');
     buttons.forEach(b => {
@@ -811,7 +821,8 @@ function checkAnswer(btn, levelId) {
       b.disabled = true;
     });
     encEl.textContent = ENCOURAGE[rand(7, 12)];
-    setTimeout(() => newQuestion(levelId), 900);
+    clearPendingTimeout(levelId);
+    pendingTimeouts[levelId] = setTimeout(() => newQuestion(levelId), 900);
   }
   updateScore(levelId);
 }
@@ -846,6 +857,10 @@ Reveal.initialize({
 
 Reveal.on('slidechanged', event => {
   const slide = event.currentSlide;
+  const prevLevel = event.previousSlide ? event.previousSlide.dataset.level : null;
+  if (prevLevel && prevLevel !== 'mixed') {
+    clearPendingTimeout(prevLevel);
+  }
   if (slide.classList.contains('level-slide')) {
     const levelId = slide.dataset.level;
     if (levelId && levelId !== 'mixed') {
